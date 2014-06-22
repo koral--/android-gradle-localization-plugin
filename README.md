@@ -18,7 +18,8 @@ Generation has to be invoked as additional gradle task.
 1. Add maven snapshot repository and dependency to the __top-level__ `build.gradle` file.
  Your file should look like this:
  ```
- buildscript {
+ 
+  buildscript {
      repositories {
          mavenLocal()
          mavenCentral()
