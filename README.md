@@ -17,7 +17,7 @@ Generation has to be invoked as additional gradle task.
 ## Usage
 1. Add maven snapshot repository and dependency to the __top-level__ `build.gradle` file.
  Your file should look like this:
- ```gradle
+ ```
  buildscript {
      repositories {
          mavenLocal()
@@ -31,7 +31,7 @@ Generation has to be invoked as additional gradle task.
  }
  ```
 2. Apply plugin and add configuration to `build.gradle` of the application, eg:
- ```gradle
+ ```
  apply plugin: 'localization'
  localization
      {
