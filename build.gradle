@@ -4,6 +4,7 @@ apply plugin: 'signing'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -35,6 +36,10 @@ def getRepositoryUsername() {
 def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
+
+group = GROUP
+artifactId = POM_ARTIFACT_ID
+version = VERSION_NAME
 
 afterEvaluate { project ->
     uploadArchives {

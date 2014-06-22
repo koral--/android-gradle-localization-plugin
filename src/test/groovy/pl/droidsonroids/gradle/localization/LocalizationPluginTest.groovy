@@ -12,13 +12,14 @@ class LocalizationPluginTest extends GroovyTestCase {
 
     private void parseTestFile(String fileName) throws IOException
     {
-        Project project = ProjectBuilder.builder().build()
+//        Project project = ProjectBuilder.builder().build()
         def config=new ConfigExtension()
         config.csvFilePath=getClass().getResource(fileName).getPath()
-        project.setProperty('localization',config)
-        project.apply plugin: 'localization'
-        for (action in project.tasks.localization.actions)
-            action.execute(project.tasks.localization)
+//        project.setProperty('localization',config)
+//        project.apply plugin: 'localization'
+//        for (action in project.tasks.localization.actions)
+//            action.execute(project.tasks.localization)
+        new Parser(config).parseCells()
     }
 
     @Test
@@ -32,9 +33,9 @@ class LocalizationPluginTest extends GroovyTestCase {
             parseTestFile('missingTranslation.csv')
             fail(InputParseException.class.getSimpleName()+' expected')
         }
-        catch (UncheckedException ex)
+        catch (InputParseException ex)
         {
-            assert ex.getCause() instanceof InputParseException
+            println 'expected exception: '+ex.getMessage()
         }
     }
 }

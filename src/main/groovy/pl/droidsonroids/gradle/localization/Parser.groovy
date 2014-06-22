@@ -51,8 +51,8 @@ class Parser {
             mBuilder.getMkp().xmlDeclaration(version:'1.0', encoding:'utf-8')
         }
        def addResource(body)
-       {
-           mBuilder.resources(body, 'xmlns:tools':'http://schemas.android.com/tools', 'tools:locale':mQualifier)
+       {//TODO add support for tools:locale
+           mBuilder.resources(body, 'xmlns:tools':'http://schemas.android.com/tools'/*, 'tools:locale':mQualifier*/)
        }
     }
 
@@ -91,7 +91,7 @@ class Parser {
                     }
                     else
                     {
-                        if (nonTranslatable&&builder.mQualifier!=mConfig.defaultColumnName)
+                        if (nonTranslatable&&!mConfig.allowNonTranslatableTranslation&&builder.mQualifier!=mConfig.defaultColumnName)
                             throw new InputParseException(name+" is translated but marked translatable='false', row #"+(i+2))
                     }
                     if (mConfig.escapeApostrophes)
