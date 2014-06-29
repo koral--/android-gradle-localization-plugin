@@ -80,6 +80,11 @@ CSV file location. __Exactly one of them__ must be specified:
 CSV format:
 * `defaultColumnName` - default='default', column name which corresponds to default localization 
 (`values` folder)
+* `csvStrategy` - default=`null` (library default strategy, equivalent of 
+[CSVStrategy.DEFAULT_STRATEGY](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html#DEFAULT_STRATEGY))
+ - see [CSVStrategy javadoc](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html),
+ and [sources](http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-core/4.8.0/org/apache/solr/internal/csv/CSVStrategy.java#CSVStrategy)
+ since documentation is quite incomplete
 
 The following options turn off some auto-escaping, can be useful if you have it already escaped in CSV:
 * `escapeApostrophes` - default=true, if set to false apostrophes (`'`) won't be escaped

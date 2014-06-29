@@ -25,7 +25,7 @@ class Parser {
         else// if (config.csvFileURI!=null)
             reader=new InputStreamReader(new URL(config.csvFileURI).openStream())
 
-        mParser = new CSVParser(reader)
+        mParser = config.csvStrategy?new CSVParser(reader,config.csvStrategy):new CSVParser(reader)
         mConfig = config
 
         (mBuilders,mNameIdx,mTranslatableIdx,mCommentIdx,mColumnsCount) = parseHeader(mParser)

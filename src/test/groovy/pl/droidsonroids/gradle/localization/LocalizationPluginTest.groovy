@@ -1,8 +1,5 @@
 package pl.droidsonroids.gradle.localization
 
-import org.gradle.api.Project
-import org.gradle.internal.UncheckedException
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
 /**
