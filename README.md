@@ -15,7 +15,7 @@ Generation has to be invoked as additional gradle task.
  * comments
   
 ## Usage
-1. Add maven snapshot repository and dependency to the __top-level__ `build.gradle` file.
+1. Add dependency to the __top-level__ `build.gradle` file.
  Your file should look like this:
  ```
  
@@ -23,10 +23,9 @@ Generation has to be invoked as additional gradle task.
      repositories {
          mavenLocal()
          mavenCentral()
-         maven{ url('https://oss.sonatype.org/content/repositories/snapshots')}
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:0.11.+'
+         classpath 'com.android.tools.build:gradle:0.12.+'
          classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.+'
      }
  }

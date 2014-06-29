@@ -24,6 +24,7 @@ uploadArchives
 {
     repositories {
         mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
             pom.groupId = GROUP
             pom.artifactId = POM_ARTIFACT_ID
             pom.version = VERSION_NAME
@@ -79,4 +80,9 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives sourcesJar
     archives javadocsJar
+}
+
+signing {
+    required { gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
 }
