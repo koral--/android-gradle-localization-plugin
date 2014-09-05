@@ -15,8 +15,9 @@ class Parser {
     private final int mNameIdx
     private final int mColumnsCount
     private final ConfigExtension mConfig
+    private final File mResDir
 
-    public Parser(ConfigExtension config) {
+    public Parser(ConfigExtension config, File resDir) {
         Reader reader
         if (!(config.csvFilePath!=null^config.csvFileURI!=null))
             throw new IllegalArgumentException("Exactly one of properties: 'csvFilePath' or 'csvFileURI' must be defined")
@@ -25,6 +26,7 @@ class Parser {
         else// if (config.csvFileURI!=null)
             reader=new InputStreamReader(new URL(config.csvFileURI).openStream())
 
+        mResDir = resDir
         mParser = config.csvStrategy?new CSVParser(reader,config.csvStrategy):new CSVParser(reader)
         mConfig = config
 
@@ -37,10 +39,8 @@ class Parser {
         final MarkupBuilder mBuilder
         XMLBuilder(String qualifier)
         {
-            String resDirPath='src/main/res' //TODO support user defined paths
-            File resDir=new File(resDirPath)
             String valuesDirName=qualifier==mConfig.defaultColumnName?'values':'values-'+qualifier
-            File valuesDir=new File(resDir,valuesDirName)
+            File valuesDir=new File(mResDir,valuesDirName)
             if (!valuesDir.isDirectory())
                 valuesDir.mkdirs()
             File valuesFile=new File(valuesDir,'strings.xml')
@@ -102,6 +102,8 @@ class Parser {
                         value=value.replace("\n","\\n")
                     if (mConfig.escapeBoundarySpaces&&(value.indexOf(' ')==0||value.lastIndexOf(' ')==value.length()-1))
                         value='"'+value+'"'
+                    if (mConfig.convertTripleDotsToHorizontalEllipsis)
+                        value=value.replace("...","&#8230;")
                     string(attrs) { mkp.yield(value) }
                     if (mCommentIdx>=0&&!row[mCommentIdx].isEmpty())
                         mkp.comment(row[mCommentIdx])
@@ -120,6 +122,7 @@ class Parser {
         def builders = new XMLBuilder[header.size()]
 
         def reservedColumns = [NAME, COMMENT, TRANSLATABLE]
+        reservedColumns.addAll(mConfig.ignorableColumns)
         def i = 0
         for (columnName in header) {
             if (!(columnName in reservedColumns))

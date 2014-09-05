@@ -1,6 +1,7 @@
 package pl.droidsonroids.gradle.localization
 
 import org.apache.commons.csv.CSVStrategy
+import org.apache.xerces.xs.StringList
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.Plugin
@@ -16,9 +17,11 @@ class ConfigExtension{
     boolean escapeQuotes = true
     boolean escapeNewLines = true
     boolean escapeBoundarySpaces = true
+    boolean convertTripleDotsToHorizontalEllipsis = true
     String defaultColumnName = 'default'
     String csvFilePath
     String csvFileURI
+    ArrayList<String> ignorableColumns = []
     CSVStrategy csvStrategy
 }
 
@@ -26,7 +29,7 @@ class LocalizationTask extends DefaultTask {
 
     @TaskAction
     def parseFile() {
-        new Parser(project.localization).parseCells()
+        new Parser(project.localization, project.file('src/main/res')).parseCells()
     }
 }
 
