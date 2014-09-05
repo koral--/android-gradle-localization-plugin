@@ -89,8 +89,10 @@ The following options turn off some auto-escaping, can be useful if you have it 
 * `escapeApostrophes` - default=true, if set to false apostrophes (`'`) won't be escaped
 * `escapeQuotes` - default=true, if set to false double quotes (`"`)  won't be escaped
 * `escapeNewLines` - default=true, if set to false newlines won't be escaped
-* `escapeBoundarySpaces` - default=true, if set to false and value have leading or trailing spaces
-then they won't be escaped so they will be effectively removed
+* `escapeBoundarySpaces` - default=true, if set to false leading and trailing spaces
+won't be escaped so they will be effectively removed
+* `convertTripleDotsToHorizontalEllipsis` - default=true, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
+* `ignorableColumns` - default=[], columns from that list will be ignored during parsing
 
 Advanced options:
 * `allowNonTranslatableTranslation` - default=false, if set to true resources marked 
