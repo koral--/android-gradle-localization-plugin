@@ -1,5 +1,6 @@
 package pl.droidsonroids.gradle.localization
 
+import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
 /**
@@ -7,16 +8,9 @@ import org.junit.Test
  */
 class LocalizationPluginTest extends GroovyTestCase {
 
-    private void parseTestFile(String fileName) throws IOException
-    {
-//        Project project = ProjectBuilder.builder().build()
+    @Test
+    void testGoogleSpreadSheet() {//TODO
         def config=new ConfigExtension()
-        config.csvFilePath=getClass().getResource(fileName).getPath()
-//        project.setProperty('localization',config)
-//        project.apply plugin: 'localization'
-//        for (action in project.tasks.localization.actions)
-//            action.execute(project.tasks.localization)
-        new Parser(config).parseCells()
     }
 
     @Test
@@ -33,6 +27,23 @@ class LocalizationPluginTest extends GroovyTestCase {
         catch (InputParseException ex)
         {
             println 'expected exception: '+ex.getMessage()
+        }
+    }
+
+    private static void parseTestFile(String fileName) {
+        def config = new ConfigExtension()
+        config.csvFile = new File(getClass().getResource(fileName).getPath())
+        parseTestCSV(config)
+    }
+
+    private static void parseTestCSV(ConfigExtension config) throws IOException {
+        def project = ProjectBuilder.builder().build()
+        def resDir = project.file('src/main/res')
+        try {
+            new Parser(config, resDir).parseCells()
+        }
+        finally {
+            resDir.deleteDir()
         }
     }
 }

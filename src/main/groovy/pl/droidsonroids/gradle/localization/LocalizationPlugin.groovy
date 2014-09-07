@@ -1,10 +1,9 @@
 package pl.droidsonroids.gradle.localization
 
 import org.apache.commons.csv.CSVStrategy
-import org.apache.xerces.xs.StringList
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -18,8 +17,9 @@ class ConfigExtension{
     boolean escapeNewLines = true
     boolean escapeBoundarySpaces = true
     boolean convertTripleDotsToHorizontalEllipsis = true
+    boolean escapeSlashes = true
     String defaultColumnName = 'default'
-    String csvFilePath
+    File csvFile
     String csvFileURI
     ArrayList<String> ignorableColumns = []
     CSVStrategy csvStrategy

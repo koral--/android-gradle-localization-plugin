@@ -19,10 +19,10 @@ class Parser {
 
     public Parser(ConfigExtension config, File resDir) {
         Reader reader
-        if (!(config.csvFilePath!=null^config.csvFileURI!=null))
-            throw new IllegalArgumentException("Exactly one of properties: 'csvFilePath' or 'csvFileURI' must be defined")
-        else if (config.csvFilePath!=null)
-            reader=new FileReader(config.csvFilePath)
+        if (!(config.csvFile != null ^ config.csvFileURI != null))
+            throw new IllegalArgumentException("Exactly one of properties: 'csvFile' or 'csvFileURI' must be defined")
+        else if (config.csvFile != null)
+            reader = new FileReader(config.csvFile)
         else// if (config.csvFileURI!=null)
             reader=new InputStreamReader(new URL(config.csvFileURI).openStream())
 
@@ -52,7 +52,7 @@ class Parser {
         }
        def addResource(body)
        {//TODO add support for tools:locale
-           mBuilder.resources(body, 'xmlns:tools':'http://schemas.android.com/tools'/*, 'tools:locale':mQualifier*/)
+           mBuilder.resources(body/*, 'xmlns:tools':'http://schemas.android.com/tools', 'tools:locale':mQualifier*/)
        }
     }
 
@@ -76,24 +76,26 @@ class Parser {
                     if (!keys.add(name))
                         throw new InputParseException(name+" is duplicated in row #"+(i+2))
                     attrs.put('name', name)
-                    def nonTranslatable=true
+                    def translatable = true
                     if (mTranslatableIdx>=0) {
-                       nonTranslatable=row[mTranslatableIdx]=='false'
-                       attrs.put('translatable', nonTranslatable?'false':null)
+                        translatable = !row[mTranslatableIdx].equalsIgnoreCase('false')
+                        attrs.put('translatable', translatable ? null : 'false')
                     }
                     def value=row[j]
                     if (value.isEmpty())
                     {
-                        if (nonTranslatable&&builder.mQualifier!=mConfig.defaultColumnName)
+                        if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
                             continue
                         if (!mConfig.allowEmptyTranslations)
                             throw new InputParseException(name+" is not translated to locale "+builder.mQualifier+", row #"+(i+2))
                     }
                     else
                     {
-                        if (nonTranslatable&&!mConfig.allowNonTranslatableTranslation&&builder.mQualifier!=mConfig.defaultColumnName)
+                        if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
                             throw new InputParseException(name+" is translated but marked translatable='false', row #"+(i+2))
                     }
+                    if (mConfig.escapeSlashes)
+                        value = value.replace("\\", "\\\\")
                     if (mConfig.escapeApostrophes)
                         value=value.replace("'","\\'")
                     if (mConfig.escapeQuotes)
@@ -117,6 +119,8 @@ class Parser {
         def keyIdx=header.indexOf(NAME)
         if (keyIdx==-1)
             throw new InputParseException("'name' column is not present")
+        if (header.indexOf(mConfig.defaultColumnName) == -1)
+            throw new InputParseException("Default locale column is not present")
         if (header.size() < 2)
             throw new InputParseException("At least one qualifier column is needed")
         def builders = new XMLBuilder[header.size()]

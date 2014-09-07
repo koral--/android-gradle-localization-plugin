@@ -35,7 +35,7 @@ Generation has to be invoked as additional gradle task.
  apply plugin: 'localization'
  localization
      {
-         csvFilePath='translations.csv'
+         csvFile=file('translations.csv')
      }
  ```
  
@@ -73,7 +73,7 @@ will produce 2 XML files:
 `localization` extension in `build.gradle` can contain several configuration options. All of them 
 except CSV file location are optional and has reasonable default values.<br>
 CSV file location. __Exactly one of them__ must be specified:
-* `csvFilePath` - path to CSV file (relative or absolute)
+* `csvFile` - CSV File, Gradle's `file()` can be used to retrieve files by path relative to module location or absolute   
 * `csvFileURI` - CSV file URI
 
 CSV format:

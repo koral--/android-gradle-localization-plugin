@@ -20,21 +20,30 @@ group = GROUP
 artifactId = POM_ARTIFACT_ID
 version = VERSION_NAME
 
+def getRepositoryUsername() {
+    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+}
+
 uploadArchives
 {
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+            }
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+            }
+
             pom.groupId = GROUP
             pom.artifactId = POM_ARTIFACT_ID
             pom.version = VERSION_NAME
-
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-            }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                authentication(userName: NEXUS_USERNAME,  password: NEXUS_PASSWORD)
-            }
 
             pom.project {
                 name POM_NAME
