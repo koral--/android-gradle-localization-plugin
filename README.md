@@ -36,8 +36,11 @@ Generation has to be invoked as additional gradle task.
  localization
      {
          csvFile=file('translations.csv')
+         OR
+         csvFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=csv'
      }
  ```
+ `csvFileURI` can be any valid URI, not necessarily Google Docs' one 
  
 3. Invoke `localization` gradle task. Task may be invoked from commandline or from Android Studio GUI.
  * from commandline: `./gradlew localization` (or `gradlew.bat localization` on Windows)
@@ -85,16 +88,17 @@ CSV format:
  and [sources](http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-core/4.8.0/org/apache/solr/internal/csv/CSVStrategy.java#CSVStrategy)
  since documentation is quite incomplete
 
-The following options turn off some auto-escaping, can be useful if you have it already escaped in CSV:
+The following options turn off some auto-escaping, can be useful if you have something already escaped in CSV:
 * `escapeApostrophes` - default=true, if set to false apostrophes (`'`) won't be escaped
 * `escapeQuotes` - default=true, if set to false double quotes (`"`)  won't be escaped
-* `escapeNewLines` - default=true, if set to false newlines won't be escaped
+* `escapeNewLines` - default=true, if set to false newline characters won't be escaped
 * `escapeBoundarySpaces` - default=true, if set to false leading and trailing spaces
-won't be escaped so they will be effectively removed
+won't be escaped so they will be effectively removed at compile time
 * `convertTripleDotsToHorizontalEllipsis` - default=true, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
-* `ignorableColumns` - default=[], columns from that list will be ignored during parsing
+* `escapeSlashes` - default=true, if set to false slashes (`\`) won't be escaped
 
 Advanced options:
+* `ignorableColumns` - default=[], columns from that list will be ignored during parsing
 * `allowNonTranslatableTranslation` - default=false, if set to true resources marked 
 non-translatable but translated are permitted
 * `allowEmptyTranslations` - default=false, if set to true then empty values are permitted

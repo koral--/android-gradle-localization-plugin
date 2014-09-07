@@ -116,13 +116,15 @@ class Parser {
 
     private parseHeader(CSVParser mParser) throws IOException {
         List<String> header = Arrays.asList(mParser.getLine())
+        if (header.isEmpty())
+            throw new InputParseException("Empty header. Is data in CSV format?")
         def keyIdx=header.indexOf(NAME)
         if (keyIdx==-1)
-            throw new InputParseException("'name' column is not present")
+            throw new InputParseException("'name' column not present")
         if (header.indexOf(mConfig.defaultColumnName) == -1)
-            throw new InputParseException("Default locale column is not present")
+            throw new InputParseException("Default locale column not present")
         if (header.size() < 2)
-            throw new InputParseException("At least one qualifier column is needed")
+            throw new InputParseException("At least one qualifier column needed")
         def builders = new XMLBuilder[header.size()]
 
         def reservedColumns = [NAME, COMMENT, TRANSLATABLE]

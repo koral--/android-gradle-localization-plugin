@@ -9,30 +9,33 @@ import org.junit.Test
 class LocalizationPluginTest extends GroovyTestCase {
 
     @Test
-    void testGoogleSpreadSheet() {//TODO
+    void testCsvFileConfig() {
         def config=new ConfigExtension()
+        config.csvFile = new File(getClass().getResource('valid.csv').getPath())
+        parseTestCSV(config)
     }
 
     @Test
     void testValidFile() {
+        println 'testing valid file'
         parseTestFile('valid.csv')
     }
 
     @Test
     void testMissingTranslation() {
+        println 'testing invalid file'
         try {
             parseTestFile('missingTranslation.csv')
             fail(InputParseException.class.getSimpleName()+' expected')
         }
-        catch (InputParseException ex)
-        {
-            println 'expected exception: '+ex.getMessage()
+        catch (InputParseException ignored) {
+            println 'expected exception thrown'
         }
     }
 
-    private static void parseTestFile(String fileName) {
+    private void parseTestFile(String fileName) {
         def config = new ConfigExtension()
-        config.csvFile = new File(getClass().getResource(fileName).getPath())
+        config.csvFileURI = getClass().getResource(fileName).toURI()
         parseTestCSV(config)
     }
 
