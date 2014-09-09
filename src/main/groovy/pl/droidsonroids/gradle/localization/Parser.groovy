@@ -105,7 +105,7 @@ class Parser {
                     if (mConfig.escapeBoundarySpaces&&(value.indexOf(' ')==0||value.lastIndexOf(' ')==value.length()-1))
                         value='"'+value+'"'
                     if (mConfig.convertTripleDotsToHorizontalEllipsis)
-                        value=value.replace("...","&#8230;")
+                        value=value.replace("...","…")
                     string(attrs) { mkp.yield(value) }
                     if (mCommentIdx>=0&&!row[mCommentIdx].isEmpty())
                         mkp.comment(row[mCommentIdx])
