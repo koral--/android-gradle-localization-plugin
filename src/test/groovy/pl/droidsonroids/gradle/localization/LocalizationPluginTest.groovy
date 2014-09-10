@@ -18,7 +18,11 @@ class LocalizationPluginTest extends GroovyTestCase {
     @Test
     void testValidFile() {
         println 'testing valid file'
+        long a = System.nanoTime()
         parseTestFile('valid.csv')
+        println System.nanoTime() - a
+        //1 131 572 583
+        //1 197 234 868
     }
 
     @Test

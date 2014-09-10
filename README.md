@@ -88,7 +88,8 @@ CSV format:
  and [sources](http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-core/4.8.0/org/apache/solr/internal/csv/CSVStrategy.java#CSVStrategy)
  since documentation is quite incomplete
 
-The following options turn off some auto-escaping, can be useful if you have something already escaped in CSV:
+The following options turn off some character escaping and substitutions, can be useful if you have 
+something already escaped in CSV:
 * `escapeApostrophes` - default=true, if set to false apostrophes (`'`) won't be escaped
 * `escapeQuotes` - default=true, if set to false double quotes (`"`)  won't be escaped
 * `escapeNewLines` - default=true, if set to false newline characters won't be escaped
@@ -96,6 +97,9 @@ The following options turn off some auto-escaping, can be useful if you have som
 won't be escaped so they will be effectively removed at compile time
 * `convertTripleDotsToHorizontalEllipsis` - default=true, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
 * `escapeSlashes` - default=true, if set to false slashes (`\`) won't be escaped
+* `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
+if set to `null` Unicode normalization won't be performed, see (javadoc of Normalizer)[http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC]
+for more details
 
 Advanced options:
 * `ignorableColumns` - default=[], columns from that list will be ignored during parsing

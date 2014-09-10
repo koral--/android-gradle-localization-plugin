@@ -3,6 +3,7 @@ package pl.droidsonroids.gradle.localization
 import groovy.xml.MarkupBuilder
 import org.apache.commons.csv.CSVParser
 
+import java.text.Normalizer
 import java.util.regex.Pattern
 
 class Parser {
@@ -44,11 +45,16 @@ class Parser {
             if (!valuesDir.isDirectory())
                 valuesDir.mkdirs()
             File valuesFile=new File(valuesDir,'strings.xml')
-            mBuilder=new MarkupBuilder(new FileWriter(valuesFile))
+            mBuilder = new MarkupBuilder(
+                    new OutputStreamWriter(
+                            new BufferedOutputStream(
+                                    new FileOutputStream(valuesFile)
+                                    , 512 * 1024)
+                            , 'UTF-8'))
             mBuilder.setDoubleQuotes(true)
             mBuilder.setOmitNullAttributes(true)
             mQualifier=qualifier
-            mBuilder.getMkp().xmlDeclaration(version:'1.0', encoding:'utf-8')
+            mBuilder.getMkp().xmlDeclaration(version: '1.0', encoding: 'UTF-8')
         }
        def addResource(body)
        {//TODO add support for tools:locale
@@ -106,6 +112,8 @@ class Parser {
                         value='"'+value+'"'
                     if (mConfig.convertTripleDotsToHorizontalEllipsis)
                         value=value.replace("...","…")
+                    if (mConfig.normalizationForm != null)
+                        value = Normalizer.normalize(value, mConfig.normalizationForm)
                     string(attrs) { mkp.yield(value) }
                     if (mCommentIdx>=0&&!row[mCommentIdx].isEmpty())
                         mkp.comment(row[mCommentIdx])

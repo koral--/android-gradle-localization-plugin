@@ -6,6 +6,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
+import java.text.Normalizer
+
 /**
  * @author koral--
  */
@@ -18,6 +20,7 @@ class ConfigExtension{
     boolean escapeBoundarySpaces = true
     boolean convertTripleDotsToHorizontalEllipsis = true
     boolean escapeSlashes = true
+    Normalizer.Form normalizationForm = Normalizer.Form.NFC
     String defaultColumnName = 'default'
     File csvFile
     String csvFileURI
