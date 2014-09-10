@@ -10,7 +10,7 @@ class LocalizationPluginTest extends GroovyTestCase {
 
     @Test
     void testCsvFileConfig() {
-        def config=new ConfigExtension()
+        def config = new ConfigExtension()
         config.csvFile = new File(getClass().getResource('valid.csv').getPath())
         parseTestCSV(config)
     }
@@ -18,11 +18,7 @@ class LocalizationPluginTest extends GroovyTestCase {
     @Test
     void testValidFile() {
         println 'testing valid file'
-        long a = System.nanoTime()
         parseTestFile('valid.csv')
-        println System.nanoTime() - a
-        //1 131 572 583
-        //1 197 234 868
     }
 
     @Test
@@ -30,7 +26,7 @@ class LocalizationPluginTest extends GroovyTestCase {
         println 'testing invalid file'
         try {
             parseTestFile('missingTranslation.csv')
-            fail(InputParseException.class.getSimpleName()+' expected')
+            fail(InputParseException.class.getSimpleName() + ' expected')
         }
         catch (InputParseException ignored) {
             println 'expected exception thrown'
