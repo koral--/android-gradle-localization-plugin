@@ -1,5 +1,6 @@
 android-gradle-localization-plugin
 ==================================
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-android--gradle--localization--plugin-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/902)
 
 Gradle plugin for generating localized string resources
 
