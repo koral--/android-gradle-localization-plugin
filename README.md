@@ -26,7 +26,7 @@ Generation has to be invoked as additional gradle task.
          mavenCentral()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:0.12.+'
+         classpath 'com.android.tools.build:gradle:0.13.+'
          classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.+'
      }
  }
@@ -101,6 +101,13 @@ won't be escaped so they will be effectively removed at compile time
 * `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
 if set to `null` Unicode normalization won't be performed, see (javadoc of Normalizer)[http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC]
 for more details
+* `tagEscapingStrategy` - default=IF_TAGS_ABSENT, defines X(H)TML tag brackets (&lt; and &gt;) escaping strategy
+possible values:
+ * ALWAYS - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML
+ * NEVER - brackets are never escaped. Eg. "&lt;" in source is passed without change to output XML
+ * IF_TAGS_ABSENT - Brackets aren't escaped if text contains tags. Eg.
+   &lt;b&gt;bold&lt;/b&gt;} will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
+   See [JSoup](http://jsoup.org) - library used to detect tags
 
 Advanced options:
 * `ignorableColumns` - default=[], columns from that list will be ignored during parsing

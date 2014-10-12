@@ -2,13 +2,18 @@ package pl.droidsonroids.gradle.localization
 
 import groovy.xml.MarkupBuilder
 import org.apache.commons.csv.CSVParser
+import org.jsoup.Jsoup
 
 import java.text.Normalizer
 import java.util.regex.Pattern
 
+/**
+ * Class containing CSV parser logic
+ */
 class Parser {
-    private static final Pattern JAVA_IDENTIFIER_REGEX=Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
-    private static final String NAME ="name", TRANSLATABLE="translatable", COMMENT="comment"
+    private static
+    final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
+    private static final String NAME = "name", TRANSLATABLE = "translatable", COMMENT = "comment"
     private final CSVParser mParser
     private final XMLBuilder[] mBuilders
     private final int mCommentIdx
@@ -25,97 +30,99 @@ class Parser {
         else if (config.csvFile != null)
             reader = new FileReader(config.csvFile)
         else// if (config.csvFileURI!=null)
-            reader=new InputStreamReader(new URL(config.csvFileURI).openStream())
+            reader = new InputStreamReader(new URL(config.csvFileURI).openStream())
 
         mResDir = resDir
-        mParser = config.csvStrategy?new CSVParser(reader,config.csvStrategy):new CSVParser(reader)
+        mParser = config.csvStrategy ? new CSVParser(reader, config.csvStrategy) : new CSVParser(reader)
         mConfig = config
 
-        (mBuilders,mNameIdx,mTranslatableIdx,mCommentIdx,mColumnsCount) = parseHeader(mParser)
+        (mBuilders, mNameIdx, mTranslatableIdx, mCommentIdx, mColumnsCount) = parseHeader(mParser)
     }
 
-    class XMLBuilder
-    {
+    class XMLBuilder {
         final String mQualifier
         final MarkupBuilder mBuilder
-        XMLBuilder(String qualifier)
-        {
-            String valuesDirName=qualifier==mConfig.defaultColumnName?'values':'values-'+qualifier
-            File valuesDir=new File(mResDir,valuesDirName)
+
+        XMLBuilder(String qualifier) {
+            String valuesDirName = qualifier == mConfig.defaultColumnName ? 'values' : 'values-' + qualifier
+            File valuesDir = new File(mResDir, valuesDirName)
             if (!valuesDir.isDirectory())
                 valuesDir.mkdirs()
-            File valuesFile=new File(valuesDir,'strings.xml')
+            File valuesFile = new File(valuesDir, 'strings.xml')
             mBuilder = new MarkupBuilder(
                     new OutputStreamWriter(
                             new BufferedOutputStream(
                                     new FileOutputStream(valuesFile)
-                                    , 512 * 1024)
+                                    , 128 * 1024)
                             , 'UTF-8'))
             mBuilder.setDoubleQuotes(true)
             mBuilder.setOmitNullAttributes(true)
-            mQualifier=qualifier
+            mQualifier = qualifier
             mBuilder.getMkp().xmlDeclaration(version: '1.0', encoding: 'UTF-8')
         }
-       def addResource(body)
-       {//TODO add support for tools:locale
-           mBuilder.resources(body/*, 'xmlns:tools':'http://schemas.android.com/tools', 'tools:locale':mQualifier*/)
-       }
+
+        def addResource(body) {//TODO add support for tools:locale
+            mBuilder.resources(body/*, 'xmlns:tools':'http://schemas.android.com/tools', 'tools:locale':mQualifier*/)
+        }
     }
 
     public parseCells() throws IOException {
         String[][] cells = mParser.getAllValues()
-        def attrs=new LinkedHashMap<>(2)
+        def attrs = new LinkedHashMap<>(2)
         for (j in 0..mBuilders.length - 1) {
             def builder = mBuilders[j]
             if (builder == null)
                 continue
-            def keys=new HashSet(cells.length)
+            def keys = new HashSet(cells.length)
             builder.addResource({
-                for (i in 0..cells.length-1)
-                {
-                    def row=cells[i]
-                    if (row.size()<mColumnsCount)
-                        throw new InputParseException("Undersized row #"+(i+2))
-                    def name=row[mNameIdx]
+                for (i in 0..cells.length - 1) {
+                    def row = cells[i]
+                    if (row.size() < mColumnsCount)
+                        throw new InputParseException("Undersized row #" + (i + 2))
+                    def name = row[mNameIdx]
                     if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
-                        throw new InputParseException(name+" is not valid name, row #"+(i+2))
+                        throw new InputParseException(name + " is not valid name, row #" + (i + 2))
                     if (!keys.add(name))
-                        throw new InputParseException(name+" is duplicated in row #"+(i+2))
+                        throw new InputParseException(name + " is duplicated in row #" + (i + 2))
                     attrs.put('name', name)
                     def translatable = true
-                    if (mTranslatableIdx>=0) {
+                    if (mTranslatableIdx >= 0) {
                         translatable = !row[mTranslatableIdx].equalsIgnoreCase('false')
                         attrs.put('translatable', translatable ? null : 'false')
                     }
-                    def value=row[j]
-                    if (value.isEmpty())
-                    {
+                    def value = row[j]
+                    if (value.isEmpty()) {
                         if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
                             continue
                         if (!mConfig.allowEmptyTranslations)
-                            throw new InputParseException(name+" is not translated to locale "+builder.mQualifier+", row #"+(i+2))
-                    }
-                    else
-                    {
+                            throw new InputParseException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 2))
+                    } else {
                         if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
-                            throw new InputParseException(name+" is translated but marked translatable='false', row #"+(i+2))
+                            throw new InputParseException(name + " is translated but marked translatable='false', row #" + (i + 2))
                     }
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")
                     if (mConfig.escapeApostrophes)
-                        value=value.replace("'","\\'")
-                    if (mConfig.escapeQuotes)
-                        value=value.replace("\"","\\\"")
+                        value = value.replace("'", "\\'")
+                    if (mConfig.escapeQuotes) //TODO don't escape tag attribute values
+                        value = value.replace("\"", "\\\"")
                     if (mConfig.escapeNewLines)
-                        value=value.replace("\n","\\n")
-                    if (mConfig.escapeBoundarySpaces&&(value.indexOf(' ')==0||value.lastIndexOf(' ')==value.length()-1))
-                        value='"'+value+'"'
+                        value = value.replace("\n", "\\n")
+                    if (mConfig.escapeBoundarySpaces && (value.indexOf(' ') == 0 || value.lastIndexOf(' ') == value.length() - 1))
+                        value = '"' + value + '"'
                     if (mConfig.convertTripleDotsToHorizontalEllipsis)
-                        value=value.replace("...","…")
+                        value = value.replace("...", "…")
                     if (mConfig.normalizationForm != null)
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
-                    string(attrs) { mkp.yield(value) }
-                    if (mCommentIdx>=0&&!row[mCommentIdx].isEmpty())
+                    string(attrs) {
+                        if (mConfig.tagEscapingStrategy == TagEscapingStrategy.ALWAYS ||
+                                (mConfig.tagEscapingStrategy == TagEscapingStrategy.IF_TAGS_ABSENT &&
+                                        Jsoup.parse(value).body().children().isEmpty()))
+                            mkp.yield(value)
+                        else
+                            mkp.yieldUnescaped(value)
+                    }
+                    if (mCommentIdx >= 0 && !row[mCommentIdx].isEmpty())
                         mkp.comment(row[mCommentIdx])
                 }
             })
@@ -126,8 +133,8 @@ class Parser {
         List<String> header = Arrays.asList(mParser.getLine())
         if (header.isEmpty())
             throw new InputParseException("Empty header. Is data in CSV format?")
-        def keyIdx=header.indexOf(NAME)
-        if (keyIdx==-1)
+        def keyIdx = header.indexOf(NAME)
+        if (keyIdx == -1)
             throw new InputParseException("'name' column not present")
         if (header.indexOf(mConfig.defaultColumnName) == -1)
             throw new InputParseException("Default locale column not present")

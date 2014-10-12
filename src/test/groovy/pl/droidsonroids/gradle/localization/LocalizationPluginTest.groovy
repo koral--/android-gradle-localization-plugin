@@ -3,9 +3,6 @@ package pl.droidsonroids.gradle.localization
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
-/**
- * Created by koral on 21.06.14.
- */
 class LocalizationPluginTest extends GroovyTestCase {
 
     @Test
@@ -25,8 +22,8 @@ class LocalizationPluginTest extends GroovyTestCase {
     void testMissingTranslation() {
         println 'testing invalid file'
         try {
-            parseTestFile('missingTranslation.csv')
-            fail(InputParseException.class.getSimpleName() + ' expected')
+            parseTestFile('missing_translation.csv')
+            fail(InputParseException.class.getName() + ' expected')
         }
         catch (InputParseException ignored) {
             println 'expected exception thrown'
