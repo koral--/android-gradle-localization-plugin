@@ -23,9 +23,9 @@ class LocalizationPluginTest extends GroovyTestCase {
         println 'testing invalid file'
         try {
             parseTestFile('missing_translation.csv')
-            fail(InputParseException.class.getName() + ' expected')
+            fail(IOException.class.getName() + ' expected')
         }
-        catch (InputParseException ignored) {
+        catch (IOException ignored) {
             println 'expected exception thrown'
         }
     }
