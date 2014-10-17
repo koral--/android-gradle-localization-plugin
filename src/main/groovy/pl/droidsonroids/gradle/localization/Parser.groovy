@@ -78,12 +78,12 @@ class Parser {
                 for (i in 0..cells.length - 1) {
                     def row = cells[i]
                     if (row.size() < mColumnsCount)
-                        throw new InputParseException("Undersized row #" + (i + 2))
+                        throw new IOException("Undersized row #" + (i + 2))
                     def name = row[mNameIdx]
                     if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
-                        throw new InputParseException(name + " is not valid name, row #" + (i + 2))
+                        throw new IOException(name + " is not valid name, row #" + (i + 2))
                     if (!keys.add(name))
-                        throw new InputParseException(name + " is duplicated in row #" + (i + 2))
+                        throw new IOException(name + " is duplicated in row #" + (i + 2))
                     attrs.put('name', name)
                     def translatable = true
                     if (mTranslatableIdx >= 0) {
@@ -95,10 +95,10 @@ class Parser {
                         if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
                             continue
                         if (!mConfig.allowEmptyTranslations)
-                            throw new InputParseException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 2))
+                            throw new IOException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 2))
                     } else {
                         if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
-                            throw new InputParseException(name + " is translated but marked translatable='false', row #" + (i + 2))
+                            throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
                     }
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")
@@ -132,14 +132,14 @@ class Parser {
     private parseHeader(CSVParser mParser) throws IOException {
         List<String> header = Arrays.asList(mParser.getLine())
         if (header.isEmpty())
-            throw new InputParseException("Empty header. Is data in CSV format?")
+            throw new IOException("Empty header. Is data in CSV format?")
         def keyIdx = header.indexOf(NAME)
         if (keyIdx == -1)
-            throw new InputParseException("'name' column not present")
+            throw new IOException("'name' column not present")
         if (header.indexOf(mConfig.defaultColumnName) == -1)
-            throw new InputParseException("Default locale column not present")
+            throw new IOException("Default locale column not present")
         if (header.size() < 2)
-            throw new InputParseException("At least one qualifier column needed")
+            throw new IOException("At least one qualifier column needed")
         def builders = new XMLBuilder[header.size()]
 
         def reservedColumns = [NAME, COMMENT, TRANSLATABLE]
