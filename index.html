@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Android-gradle-localization-plugin by koral--</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/koral--/android-gradle-localization-plugin">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/koral--/android-gradle-localization-plugin/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/koral--/android-gradle-localization-plugin/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Android-gradle-localization-plugin</h1>
+          <p>Gradle plugin for generating localized string resources</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/koral--">koral--</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="android-gradle-localization-plugin" class="anchor" href="#android-gradle-localization-plugin"><span class="octicon octicon-link"></span></a>android-gradle-localization-plugin</h1>
+
+<p><a href="https://maven-badges.herokuapp.com/maven-central/pl.droidsonroids.gradle.localization/android-gradle-localization-plugin"><img src="https://maven-badges.herokuapp.com/maven-central/pl.droidsonroids.gradle.localization/android-gradle-localization-plugin/badge.svg?style=flat" alt="Maven Central"></a> <a href="https://android-arsenal.com/details/1/902"><img src="https://img.shields.io/badge/Android%20Arsenal-android--gradle--localization--plugin-brightgreen.svg?style=flat" alt="Android Arsenal"></a>  <a href="https://travis-ci.org/koral--/android-gradle-localization-plugin"><img src="https://travis-ci.org/koral--/android-gradle-localization-plugin.svg?branch=master" alt="Build Status"></a></p>
+
+<p>Gradle plugin for generating localized string resources</p>
+
+<h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
+
+<p>This plugin generates Android string resource XML files from CSV file.
+Generation has to be invoked as additional gradle task.</p>
+
+<h2>
+<a name="supported-features" class="anchor" href="#supported-features"><span class="octicon octicon-link"></span></a>Supported features</h2>
+
+<ul>
+<li>non-translatable resources - <code>translatable="false"</code> XML attribute</li>
+<li>auto-escaping double quotes, apostrophes and newlines</li>
+<li>auto-quoting leading and trailing spaces</li>
+<li>syntax validation - duplicated, empty, invalid names detection</li>
+<li>comments</li>
+</ul>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<ol>
+<li>
+<p>Add dependency to the <strong>top-level</strong> <code>build.gradle</code> file.
+Your file should look like this:</p>
+
+<pre><code>
+buildscript {
+   repositories {
+       mavenLocal()
+       mavenCentral()
+   }
+   dependencies {
+       classpath 'com.android.tools.build:gradle:0.13.+'
+       classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.+'
+   }
+}
+</code></pre>
+</li>
+<li>
+<p>Apply plugin and add configuration to <code>build.gradle</code> of the application, eg:</p>
+
+<pre><code>apply plugin: 'localization'
+localization
+   {
+       csvFile=file('translations.csv')
+       OR
+       csvFileURI='https://docs.google.com/spreadsheets/d/&lt;key&gt;/export?format=csv'
+   }
+</code></pre>
+
+<p><code>csvFileURI</code> can be any valid URI, not necessarily Google Docs' one </p>
+</li>
+<li>
+<p>Invoke <code>localization</code> gradle task. Task may be invoked from commandline or from Android Studio GUI.</p>
+
+<ul>
+<li>from commandline: <code>./gradlew localization</code> (or <code>gradlew.bat localization</code> on Windows)</li>
+<li>from GUI: menu <code>View-&gt;Tool Windows-&gt;Gradle</code> and double click <code>localization</code><br>
+</li>
+</ul>
+
+<p>Non existent folders will be created. <strong>WARNING</strong> existing XML files will be overwritten.</p>
+</li>
+</ol>
+
+<h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<p>The following CSV file:</p>
+
+<pre lang="csv"><code>name,default    ,pl       ,comment   ,translatable
+file,File       ,"Plik"   ,file label,
+app ,Application,,,false
+</code></pre>
+
+<p>will produce 2 XML files:</p>
+
+<ul>
+<li>
+<code>values/strings.xml</code>:</li>
+</ul>
+
+<div class="highlight highlight-xml"><pre><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;resources</span> <span class="na">xmlns:tools=</span><span class="s">"http://schemas.android.com/tools"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;string</span> <span class="na">name=</span><span class="s">"file"</span><span class="nt">&gt;</span>File<span class="nt">&lt;/string&gt;</span><span class="c">&lt;!-- file label --&gt;</span>
+  <span class="nt">&lt;string</span> <span class="na">name=</span><span class="s">"app"</span> <span class="na">translatable=</span><span class="s">"false"</span><span class="nt">&gt;</span>Application<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/resources&gt;</span>
+</pre></div>
+
+<ul>
+<li>
+<code>values-pl/strings.xml</code>:</li>
+</ul>
+
+<div class="highlight highlight-xml"><pre><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;resources</span> <span class="na">xmlns:tools=</span><span class="s">"http://schemas.android.com/tools"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;string</span> <span class="na">name=</span><span class="s">"file"</span><span class="nt">&gt;</span>Plik<span class="nt">&lt;/string&gt;</span><span class="c">&lt;!-- file label --&gt;</span>
+<span class="nt">&lt;/resources&gt;</span>
+</pre></div>
+
+<h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p><code>localization</code> extension in <code>build.gradle</code> can contain several configuration options. All of them 
+except CSV file location are optional and has reasonable default values.<br>
+CSV file location. <strong>Exactly one of them</strong> must be specified:</p>
+
+<ul>
+<li>
+<code>csvFile</code> - CSV File, Gradle's <code>file()</code> can be used to retrieve files by path relative to module location or absolute<br>
+</li>
+<li>
+<code>csvFileURI</code> - CSV file URI</li>
+</ul>
+
+<p>CSV format:</p>
+
+<ul>
+<li>
+<code>defaultColumnName</code> - default='default', column name which corresponds to default localization 
+(<code>values</code> folder)</li>
+<li>
+<code>csvStrategy</code> - default=<code>null</code> (library default strategy, equivalent of 
+<a href="https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html#DEFAULT_STRATEGY">CSVStrategy.DEFAULT_STRATEGY</a>)
+
+<ul>
+<li>see <a href="https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html">CSVStrategy javadoc</a>,
+and <a href="http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-core/4.8.0/org/apache/solr/internal/csv/CSVStrategy.java#CSVStrategy">sources</a>
+since documentation is quite incomplete</li>
+</ul>
+</li>
+</ul>
+
+<p>The following options turn off some character escaping and substitutions, can be useful if you have 
+something already escaped in CSV:</p>
+
+<ul>
+<li>
+<code>escapeApostrophes</code> - default=true, if set to false apostrophes (<code>'</code>) won't be escaped</li>
+<li>
+<code>escapeQuotes</code> - default=true, if set to false double quotes (<code>"</code>)  won't be escaped</li>
+<li>
+<code>escapeNewLines</code> - default=true, if set to false newline characters won't be escaped</li>
+<li>
+<code>escapeBoundarySpaces</code> - default=true, if set to false leading and trailing spaces
+won't be escaped so they will be effectively removed at compile time</li>
+<li>
+<code>convertTripleDotsToHorizontalEllipsis</code> - default=true, if set to false triple dots (<code>...</code>) won't be converted to ellipsis entity <code>&amp;#8230</code>
+</li>
+<li>
+<code>escapeSlashes</code> - default=true, if set to false slashes (<code>\</code>) won't be escaped</li>
+<li>
+<code>normalizationForm</code> - default=<a href="http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC">Normalizer.Form.NFC</a>
+if set to <code>null</code> Unicode normalization won't be performed, see (javadoc of Normalizer)[<a href="http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC">http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC</a>]
+for more details</li>
+<li>
+<code>tagEscapingStrategy</code> - default=IF_TAGS_ABSENT, defines X(H)TML tag brackets (&lt; and &gt;) escaping strategy
+possible values:
+
+<ul>
+<li>ALWAYS - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML</li>
+<li>NEVER - brackets are never escaped. Eg. "&lt;" in source is passed without change to output XML</li>
+<li>IF_TAGS_ABSENT - Brackets aren't escaped if text contains tags. Eg.
+&lt;b&gt;bold&lt;/b&gt;} will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
+See <a href="http://jsoup.org">JSoup</a> - library used to detect tags</li>
+</ul>
+</li>
+</ul>
+
+<p>Advanced options:</p>
+
+<ul>
+<li>
+<code>ignorableColumns</code> - default=[], columns from that list will be ignored during parsing</li>
+<li>
+<code>allowNonTranslatableTranslation</code> - default=false, if set to true resources marked 
+non-translatable but translated are permitted</li>
+<li>
+<code>allowEmptyTranslations</code> - default=false, if set to true then empty values are permitted</li>
+</ul>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>MIT License<br>
+See <a href="LICENSE">LICENSE</a> file.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
