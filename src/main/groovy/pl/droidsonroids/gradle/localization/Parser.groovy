@@ -14,29 +14,48 @@ class Parser {
     private static
     final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
     private static final String NAME = "name", TRANSLATABLE = "translatable", COMMENT = "comment"
+    private static final int BUFFER_SIZE = 128 * 1024
     private final CSVParser mParser
-    private final XMLBuilder[] mBuilders
-    private final int mCommentIdx
-    private final int mTranslatableIdx
-    private final int mNameIdx
-    private final int mColumnsCount
     private final ConfigExtension mConfig
     private final File mResDir
+    private final Reader mReader
 
-    public Parser(ConfigExtension config, File resDir) {
+    Parser(ConfigExtension config, File resDir) {
+        Set<Object> csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand] as Set
+        csvSources.remove(null)
+        if (csvSources.size() != 1)
+            throw new IllegalArgumentException("Exactly one source must be defined")
         Reader reader
-        if (!(config.csvFile != null ^ config.csvFileURI != null))
-            throw new IllegalArgumentException("Exactly one of properties: 'csvFile' or 'csvFileURI' must be defined")
-        else if (config.csvFile != null)
+        if (config.csvGenerationCommand != null) {
+            def process = new ProcessBuilder(config.csvGenerationCommand.split('\\s+'))
+                    .redirectError(ProcessBuilder.Redirect.INHERIT)
+                    .start()
+            reader = new InputStreamReader(process.getInputStream())
+        } else if (config.csvFile != null)
             reader = new FileReader(config.csvFile)
         else// if (config.csvFileURI!=null)
             reader = new InputStreamReader(new URL(config.csvFileURI).openStream())
 
+        mReader = reader
         mResDir = resDir
         mParser = config.csvStrategy ? new CSVParser(reader, config.csvStrategy) : new CSVParser(reader)
         mConfig = config
+    }
 
-        (mBuilders, mNameIdx, mTranslatableIdx, mCommentIdx, mColumnsCount) = parseHeader(mParser)
+    static class SourceInfo {
+        private final XMLBuilder[] mBuilders
+        private final int mCommentIdx
+        private final int mTranslatableIdx
+        private final int mNameIdx
+        private final int mColumnsCount
+
+        SourceInfo(XMLBuilder[] builders, nameIdx, translatableIdx, commentIdx, columnsCount) {
+            mBuilders = builders
+            mNameIdx = nameIdx
+            mTranslatableIdx = translatableIdx
+            mCommentIdx = commentIdx
+            mColumnsCount = columnsCount
+        }
     }
 
     class XMLBuilder {
@@ -53,7 +72,7 @@ class Parser {
                     new OutputStreamWriter(
                             new BufferedOutputStream(
                                     new FileOutputStream(valuesFile)
-                                    , 128 * 1024)
+                                    , BUFFER_SIZE)
                             , 'UTF-8'))
             mBuilder.setDoubleQuotes(true)
             mBuilder.setOmitNullAttributes(true)
@@ -66,28 +85,40 @@ class Parser {
         }
     }
 
-    public parseCells() throws IOException {
+    void parseCSV() throws IOException {
+        mReader.withReader {
+            parseCells(parseHeader(mParser))
+        }
+    }
+
+
+    private parseCells(final SourceInfo sourceInfo) throws IOException {
         String[][] cells = mParser.getAllValues()
         def attrs = new LinkedHashMap<>(2)
-        for (j in 0..mBuilders.length - 1) {
-            def builder = mBuilders[j]
+        for (j in 0..sourceInfo.mBuilders.length - 1) {
+            def builder = sourceInfo.mBuilders[j]
             if (builder == null)
                 continue
             def keys = new HashSet(cells.length)
             builder.addResource({
                 for (i in 0..cells.length - 1) {
                     def row = cells[i]
-                    if (row.size() < mColumnsCount)
-                        throw new IOException("Undersized row #" + (i + 2))
-                    def name = row[mNameIdx]
+                    if (row.size() < sourceInfo.mColumnsCount) {
+                        def extendedRow = new String[sourceInfo.mColumnsCount]
+                        System.arraycopy(row, 0, extendedRow, 0, row.size())
+                        for (k in row.size()..sourceInfo.mColumnsCount - 1)
+                            extendedRow[k] = ''
+                        row = extendedRow
+                    }
+                    def name = row[sourceInfo.mNameIdx]
                     if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
                         throw new IOException(name + " is not valid name, row #" + (i + 2))
                     if (!keys.add(name))
                         throw new IOException(name + " is duplicated in row #" + (i + 2))
                     attrs.put('name', name)
                     def translatable = true
-                    if (mTranslatableIdx >= 0) {
-                        translatable = !row[mTranslatableIdx].equalsIgnoreCase('false')
+                    if (sourceInfo.mTranslatableIdx >= 0) {
+                        translatable = !row[sourceInfo.mTranslatableIdx].equalsIgnoreCase('false')
                         attrs.put('translatable', translatable ? null : 'false')
                     }
                     def value = row[j]
@@ -122,24 +153,23 @@ class Parser {
                         else
                             mkp.yieldUnescaped(value)
                     }
-                    if (mCommentIdx >= 0 && !row[mCommentIdx].isEmpty())
-                        mkp.comment(row[mCommentIdx])
+                    if (sourceInfo.mCommentIdx >= 0 && !row[sourceInfo.mCommentIdx].isEmpty())
+                        mkp.comment(row[sourceInfo.mCommentIdx])
                 }
             })
         }
     }
 
-    private parseHeader(CSVParser mParser) throws IOException {
-        List<String> header = Arrays.asList(mParser.getLine())
-        if (header.isEmpty())
-            throw new IOException("Empty header. Is data in CSV format?")
+    private SourceInfo parseHeader(CSVParser mParser) throws IOException {
+        def headerLine = mParser.getLine()
+        if (headerLine == null || headerLine.size() < 2)
+            throw new IOException("Invalid CSV header: " + headerLine)
+        List<String> header = Arrays.asList(headerLine)
         def keyIdx = header.indexOf(NAME)
         if (keyIdx == -1)
             throw new IOException("'name' column not present")
         if (header.indexOf(mConfig.defaultColumnName) == -1)
             throw new IOException("Default locale column not present")
-        if (header.size() < 2)
-            throw new IOException("At least one qualifier column needed")
         def builders = new XMLBuilder[header.size()]
 
         def reservedColumns = [NAME, COMMENT, TRANSLATABLE]
@@ -150,6 +180,6 @@ class Parser {
                 builders[i] = new XMLBuilder(columnName)
             i++
         }
-        [builders, keyIdx, header.indexOf(TRANSLATABLE), header.indexOf(COMMENT), header.size()]
+        new SourceInfo(builders, keyIdx, header.indexOf(TRANSLATABLE), header.indexOf(COMMENT), header.size())
     }
 }

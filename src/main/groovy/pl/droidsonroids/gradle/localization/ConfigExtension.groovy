@@ -22,6 +22,7 @@ class ConfigExtension {
     String defaultColumnName = 'default'
     File csvFile
     String csvFileURI
+    String csvGenerationCommand
     ArrayList<String> ignorableColumns = []
     CSVStrategy csvStrategy
 }

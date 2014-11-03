@@ -6,6 +6,6 @@ import org.gradle.api.tasks.TaskAction
 class LocalizationTask extends DefaultTask {
     @TaskAction
     def parseFile() {
-        new Parser(project.localization, project.file('src/main/res')).parseCells()
+        new Parser(project.localization, project.file('src/main/res')).parseCSV()
     }
 }

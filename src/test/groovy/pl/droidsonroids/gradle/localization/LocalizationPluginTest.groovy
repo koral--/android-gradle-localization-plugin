@@ -40,7 +40,7 @@ class LocalizationPluginTest extends GroovyTestCase {
         def project = ProjectBuilder.builder().build()
         def resDir = project.file('src/main/res')
         try {
-            new Parser(config, resDir).parseCells()
+            new Parser(config, resDir).parseCSV()
         }
         finally {
             resDir.deleteDir()

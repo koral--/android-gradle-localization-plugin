@@ -22,11 +22,10 @@ Generation has to be invoked as additional gradle task.
  
   buildscript {
      repositories {
-         mavenLocal()
          mavenCentral()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:0.13.+'
+         classpath 'com.android.tools.build:gradle:0.14.+'
          classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.+'
      }
  }
@@ -39,6 +38,8 @@ Generation has to be invoked as additional gradle task.
          csvFile=file('translations.csv')
          OR
          csvFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=csv'
+         OR
+         csvGenerationCommand='/usr/bin/xlsx2csv translation.xlsx'
      }
  ```
  `csvFileURI` can be any valid URI, not necessarily Google Docs' one 
@@ -75,10 +76,14 @@ will produce 2 XML files:
 
 ##Configuration
 `localization` extension in `build.gradle` can contain several configuration options. All of them 
-except CSV file location are optional and has reasonable default values.<br>
-CSV file location. __Exactly one of them__ must be specified:
+except CSV source are optional and has reasonable default values.<br>
+CSV source. __Exactly one of them__ must be specified:
 * `csvFile` - CSV File, Gradle's `file()` can be used to retrieve files by path relative to module location or absolute   
 * `csvFileURI` - CSV file URI
+* `csvGenerationCommand` - shell command which writes CSV as text to standard output.
+Command string should be specified like for [Runtime#exec()](http://docs.oracle.com/javase/8/docs/api/java/lang/Runtime.html#exec-java.lang.String-).
+Standard error of the command is redirected to the standard error of the process executing gradle,
+so it could be seen in the gradle console.
 
 CSV format:
 * `defaultColumnName` - default='default', column name which corresponds to default localization 
