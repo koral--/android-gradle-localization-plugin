@@ -67,13 +67,15 @@ class Parser {
             File valuesDir = new File(mResDir, valuesDirName)
             if (!valuesDir.isDirectory())
                 valuesDir.mkdirs()
-            File valuesFile = new File(valuesDir, 'strings.xml')
+            File valuesFile = new File(valuesDir, mConfig.outputFileName)
             mBuilder = new MarkupBuilder(
-                    new OutputStreamWriter(
-                            new BufferedOutputStream(
-                                    new FileOutputStream(valuesFile)
-                                    , BUFFER_SIZE)
-                            , 'UTF-8'))
+                    new IndentPrinter(
+                            new OutputStreamWriter(
+                                    new BufferedOutputStream(
+                                            new FileOutputStream(valuesFile)
+                                            , BUFFER_SIZE)
+                                    , 'UTF-8')
+                            , mConfig.outputIndent))
             mBuilder.setDoubleQuotes(true)
             mBuilder.setOmitNullAttributes(true)
             mQualifier = qualifier

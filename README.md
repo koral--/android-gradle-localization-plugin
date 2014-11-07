@@ -86,7 +86,7 @@ Standard error of the command is redirected to the standard error of the process
 so it could be seen in the gradle console.
 
 CSV format:
-* `defaultColumnName` - default='default', column name which corresponds to default localization 
+* `defaultColumnName` - default=`'default'`, column name which corresponds to default localization
 (`values` folder)
 * `csvStrategy` - default=`null` (library default strategy, equivalent of 
 [CSVStrategy.DEFAULT_STRATEGY](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html#DEFAULT_STRATEGY))
@@ -96,29 +96,32 @@ CSV format:
 
 The following options turn off some character escaping and substitutions, can be useful if you have 
 something already escaped in CSV:
-* `escapeApostrophes` - default=true, if set to false apostrophes (`'`) won't be escaped
-* `escapeQuotes` - default=true, if set to false double quotes (`"`)  won't be escaped
-* `escapeNewLines` - default=true, if set to false newline characters won't be escaped
-* `escapeBoundarySpaces` - default=true, if set to false leading and trailing spaces
+* `escapeApostrophes` - default=`true`, if set to false apostrophes (`'`) won't be escaped
+* `escapeQuotes` - default=`true`, if set to false double quotes (`"`)  won't be escaped
+* `escapeNewLines` - default=`true`, if set to false newline characters won't be escaped
+* `escapeBoundarySpaces` - default=`true`, if set to false leading and trailing spaces
 won't be escaped so they will be effectively removed at compile time
-* `convertTripleDotsToHorizontalEllipsis` - default=true, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
-* `escapeSlashes` - default=true, if set to false slashes (`\`) won't be escaped
+* `convertTripleDotsToHorizontalEllipsis` - default=`true`, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
+* `escapeSlashes` - default=`true`, if set to false slashes (`\`) won't be escaped
 * `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
 if set to `null` Unicode normalization won't be performed, see (javadoc of Normalizer)[http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC]
 for more details
-* `tagEscapingStrategy` - default=IF_TAGS_ABSENT, defines X(H)TML tag brackets (&lt; and &gt;) escaping strategy
+* `tagEscapingStrategy` - default=`IF_TAGS_ABSENT`, defines X(H)TML tag brackets (&lt; and &gt;) escaping strategy
 possible values:
- * ALWAYS - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML
- * NEVER - brackets are never escaped. Eg. "&lt;" in source is passed without change to output XML
- * IF_TAGS_ABSENT - Brackets aren't escaped if text contains tags. Eg.
+ * `ALWAYS` - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML
+ * `NEVER` - brackets are never escaped. Eg. "&lt;" in source is passed without change to output XML
+ * `IF_TAGS_ABSENT` - Brackets aren't escaped if text contains tags. Eg.
    &lt;b&gt;bold&lt;/b&gt;} will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
    See [JSoup](http://jsoup.org) - library used to detect tags
 
 Advanced options:
-* `ignorableColumns` - default=[], columns from that list will be ignored during parsing
-* `allowNonTranslatableTranslation` - default=false, if set to true resources marked 
+* `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
+contain column names eg. `['Section', 'Notes']`
+* `allowNonTranslatableTranslation` - default=`false`, if set to true resources marked
 non-translatable but translated are permitted
-* `allowEmptyTranslations` - default=false, if set to true then empty values are permitted
+* `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted
+* `outputFileName` - default=`strings.xml`, XML file name (with extension) which should be generated as an output
+* `outputIndent` - default=`  `(two spaces), character(s) used to indent each line in output XML files
  
 ##License
 

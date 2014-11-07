@@ -25,4 +25,6 @@ class ConfigExtension {
     String csvGenerationCommand
     ArrayList<String> ignorableColumns = []
     CSVStrategy csvStrategy
+    String outputFileName = 'strings.xml'
+    String outputIndent = '  '
 }
