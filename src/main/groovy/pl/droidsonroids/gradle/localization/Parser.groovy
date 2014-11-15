@@ -27,18 +27,22 @@ class Parser {
             throw new IllegalArgumentException("Exactly one source must be defined")
         Reader reader
         if (config.csvGenerationCommand != null) {
-            def process = new ProcessBuilder(config.csvGenerationCommand.split('\\s+'))
-                    .redirectError(ProcessBuilder.Redirect.INHERIT)
-                    .start()
+            def split = config.csvGenerationCommand.split('\\s+')
+            def redirect = ProcessBuilder.Redirect.INHERIT
+            def process = new ProcessBuilder(split).redirectError(redirect).start()
             reader = new InputStreamReader(process.getInputStream())
-        } else if (config.csvFile != null)
+        } else if (config.csvFile != null) {
             reader = new FileReader(config.csvFile)
-        else// if (config.csvFileURI!=null)
+            // if (config.csvFileURI!=null)
+        } else {
             reader = new InputStreamReader(new URL(config.csvFileURI).openStream())
+        }
 
         mReader = reader
         mResDir = resDir
-        mParser = config.csvStrategy ? new CSVParser(reader, config.csvStrategy) : new CSVParser(reader)
+
+        def parser = new CSVParser(reader, config.csvStrategy)
+        mParser = config.csvStrategy ? parser : new CSVParser(reader)
         mConfig = config
     }
 
@@ -63,19 +67,18 @@ class Parser {
         final MarkupBuilder mBuilder
 
         XMLBuilder(String qualifier) {
-            String valuesDirName = qualifier == mConfig.defaultColumnName ? 'values' : 'values-' + qualifier
+            def defaultValues = qualifier == mConfig.defaultColumnName
+            String valuesDirName = defaultValues ? 'values' : 'values-' + qualifier
             File valuesDir = new File(mResDir, valuesDirName)
-            if (!valuesDir.isDirectory())
+            if (!valuesDir.isDirectory()) {
                 valuesDir.mkdirs()
+            }
             File valuesFile = new File(valuesDir, mConfig.outputFileName)
-            mBuilder = new MarkupBuilder(
-                    new IndentPrinter(
-                            new OutputStreamWriter(
-                                    new BufferedOutputStream(
-                                            new FileOutputStream(valuesFile)
-                                            , BUFFER_SIZE)
-                                    , 'UTF-8')
-                            , mConfig.outputIndent))
+
+            def outputStream = new BufferedOutputStream(new FileOutputStream(valuesFile), BUFFER_SIZE)
+            def streamWriter = new OutputStreamWriter(outputStream, 'UTF-8')
+            mBuilder = new MarkupBuilder(new IndentPrinter(streamWriter, mConfig.outputIndent))
+
             mBuilder.setDoubleQuotes(true)
             mBuilder.setOmitNullAttributes(true)
             mQualifier = qualifier
@@ -99,8 +102,9 @@ class Parser {
         def attrs = new LinkedHashMap<>(2)
         for (j in 0..sourceInfo.mBuilders.length - 1) {
             def builder = sourceInfo.mBuilders[j]
-            if (builder == null)
+            if (builder == null) {
                 continue
+            }
             def keys = new HashSet(cells.length)
             builder.addResource({
                 for (i in 0..cells.length - 1) {
@@ -178,10 +182,14 @@ class Parser {
         reservedColumns.addAll(mConfig.ignorableColumns)
         def i = 0
         for (columnName in header) {
-            if (!(columnName in reservedColumns))
+            if (!(columnName in reservedColumns)) {
                 builders[i] = new XMLBuilder(columnName)
+            }
             i++
         }
-        new SourceInfo(builders, keyIdx, header.indexOf(TRANSLATABLE), header.indexOf(COMMENT), header.size())
+
+        def translatableIdx = header.indexOf(TRANSLATABLE)
+        def commentIdx = header.indexOf(COMMENT)
+        new SourceInfo(builders, keyIdx, translatableIdx, commentIdx, header.size())
     }
 }
