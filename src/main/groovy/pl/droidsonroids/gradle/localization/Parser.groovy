@@ -13,6 +13,7 @@ import java.util.regex.Pattern
 class Parser {
     private static
     final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
+
     private static final String NAME = "name", TRANSLATABLE = "translatable", COMMENT = "comment"
     private static final int BUFFER_SIZE = 128 * 1024
     private final CSVParser mParser
@@ -99,43 +100,51 @@ class Parser {
 
     private parseCells(final SourceInfo sourceInfo) throws IOException {
         String[][] cells = mParser.getAllValues()
-        def attrs = new LinkedHashMap<>(2)
+        def stringAttrs = new LinkedHashMap<>(2)
+
         for (j in 0..sourceInfo.mBuilders.length - 1) {
-            def builder = sourceInfo.mBuilders[j]
+            XMLBuilder builder = sourceInfo.mBuilders[j]
             if (builder == null) {
                 continue
             }
             def keys = new HashSet(cells.length)
             builder.addResource({
+                def pluralsMap = new HashMap<String, List<QuantityEntry>>()
                 for (i in 0..cells.length - 1) {
-                    def row = cells[i]
-                    if (row.size() < sourceInfo.mColumnsCount) {
-                        def extendedRow = new String[sourceInfo.mColumnsCount]
-                        System.arraycopy(row, 0, extendedRow, 0, row.size())
-                        for (k in row.size()..sourceInfo.mColumnsCount - 1)
+                    String[] row = cells[i]
+                    if (row.length < sourceInfo.mColumnsCount) {
+                        String[] extendedRow = new String[sourceInfo.mColumnsCount]
+                        System.arraycopy(row, 0, extendedRow, 0, row.length)
+                        for (k in row.length..sourceInfo.mColumnsCount - 1)
                             extendedRow[k] = ''
                         row = extendedRow
                     }
-                    def name = row[sourceInfo.mNameIdx]
-                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
-                        throw new IOException(name + " is not valid name, row #" + (i + 2))
-                    if (!keys.add(name))
-                        throw new IOException(name + " is duplicated in row #" + (i + 2))
-                    attrs.put('name', name)
-                    def translatable = true
-                    if (sourceInfo.mTranslatableIdx >= 0) {
-                        translatable = !row[sourceInfo.mTranslatableIdx].equalsIgnoreCase('false')
-                        attrs.put('translatable', translatable ? null : 'false')
+                    String name = row[sourceInfo.mNameIdx]
+                    String value = row[j]
+                    String comment = null
+                    if (sourceInfo.mCommentIdx >= 0 && !row[sourceInfo.mCommentIdx].isEmpty()) {
+                        comment = row[sourceInfo.mCommentIdx]
                     }
-                    def value = row[j]
-                    if (value.isEmpty()) {
-                        if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
-                            continue
-                        if (!mConfig.allowEmptyTranslations)
-                            throw new IOException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 2))
-                    } else {
-                        if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
-                            throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
+                    def indexOfOpeningBrace = name.indexOf('[')
+                    def indexOfClosingBrace = name.indexOf(']')
+                    def isPluralOrArray = indexOfOpeningBrace > 0 && indexOfClosingBrace == name.length() - 1
+
+                    if (!isPluralOrArray) {
+                        stringAttrs.put('name', name)
+                        def translatable = true
+                        if (sourceInfo.mTranslatableIdx >= 0) {
+                            translatable = !row[sourceInfo.mTranslatableIdx].equalsIgnoreCase('false')
+                            stringAttrs.put('translatable', translatable ? null : 'false')
+                        }
+                        if (value.isEmpty()) {
+                            if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
+                                continue
+                            if (!mConfig.allowEmptyTranslations)
+                                throw new IOException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 2))
+                        } else {
+                            if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
+                                throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
+                        }
                     }
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")
@@ -151,7 +160,28 @@ class Parser {
                         value = value.replace("...", "…")
                     if (mConfig.normalizationForm != null)
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
-                    string(attrs) {
+
+                    if (isPluralOrArray) {
+                        String pluralKeyName = name.substring(0, indexOfOpeningBrace)
+                        if (!JAVA_IDENTIFIER_REGEX.matcher(pluralKeyName).matches()){
+                            throw new IOException(pluralKeyName + " is not valid name, row #" + (i + 2))
+                        }
+                        Quantity pluralQuantity = Quantity.valueOf(name.substring(indexOfOpeningBrace + 1, indexOfClosingBrace))
+//                        if (!Quantity.values().contains(pluralQuantity))
+//                            throw new IOException(pluralQuantity + " is not valid quantity, row #" + (i + 2))
+                        List<QuantityEntry> quantitiesList = pluralsMap.get(pluralKeyName)
+                        if (quantitiesList == null)
+                            quantitiesList = []
+                        if (!value.isEmpty())
+                            quantitiesList.add(new QuantityEntry(pluralQuantity, value, comment))
+                        pluralsMap.put(pluralKeyName, quantitiesList)
+                        continue
+                    } else if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
+                        throw new IOException(name + " is not valid name, row #" + (i + 2))
+                    if (!keys.add(name))
+                        throw new IOException(name + " is duplicated in row #" + (i + 2))
+
+                    string(stringAttrs) {
                         if (mConfig.tagEscapingStrategy == TagEscapingStrategy.ALWAYS ||
                                 (mConfig.tagEscapingStrategy == TagEscapingStrategy.IF_TAGS_ABSENT &&
                                         Jsoup.parse(value).body().children().isEmpty()))
@@ -159,8 +189,20 @@ class Parser {
                         else
                             mkp.yieldUnescaped(value)
                     }
-                    if (sourceInfo.mCommentIdx >= 0 && !row[sourceInfo.mCommentIdx].isEmpty())
-                        mkp.comment(row[sourceInfo.mCommentIdx])
+                    if (comment) {
+                        mkp.comment(comment)
+                    }
+                }
+                for (Map.Entry<String, List<QuantityEntry>> entry : pluralsMap) {
+                    plurals([name: entry.key]) {
+                        for (QuantityEntry quantityEntry : entry.value) {
+                            item(quantity: quantityEntry.quantity) {
+                                mkp.yield(quantityEntry.value)
+                            }
+                            if (quantityEntry.comment)
+                                mkp.comment(quantityEntry.comment)
+                        }
+                    }
                 }
             })
         }

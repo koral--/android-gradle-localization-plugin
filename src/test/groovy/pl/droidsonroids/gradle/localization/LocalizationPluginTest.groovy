@@ -2,7 +2,6 @@ package pl.droidsonroids.gradle.localization
 
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
-
 //TODO add more tests
 class LocalizationPluginTest extends GroovyTestCase {
 

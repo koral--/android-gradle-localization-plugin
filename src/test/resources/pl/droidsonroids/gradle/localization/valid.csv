@@ -1,3 +1,5 @@
-name,default    ,pl       ,comment   ,translatable
-file,File       ,"Plik"   ,file label,
-app ,Application,,,false
+name        ,default    ,pl         ,comment    ,translatable
+app         ,Application, ,,false
+cow[one]  ,cow      ,krowa
+file        ,File       ,"Plik"     ,file label ,
+cow[other],cows     ,krowy,comment
