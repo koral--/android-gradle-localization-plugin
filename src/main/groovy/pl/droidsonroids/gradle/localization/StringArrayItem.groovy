@@ -3,11 +3,10 @@ package pl.droidsonroids.gradle.localization
 import groovy.transform.TupleConstructor
 
 /**
- * Descriptor of quantity item
+ * Descriptor of string-array item
  */
 @TupleConstructor
-class QuantityItem {
-    Quantity quantity
+class StringArrayItem {
     String value
     String comment
 }

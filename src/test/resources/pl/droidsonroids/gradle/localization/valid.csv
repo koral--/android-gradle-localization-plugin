@@ -3,3 +3,4 @@ app         ,Application, ,,false
 cow[one]  ,cow      ,krowa
 file        ,File       ,"Plik"     ,file label ,
 cow[other],cows     ,krowy,comment
+a[],v,,,false
