@@ -1,6 +1,7 @@
 package pl.droidsonroids.gradle.localization
 
 import groovy.xml.MarkupBuilder
+import groovy.xml.MarkupBuilderHelper
 import org.apache.commons.csv.CSVParser
 import org.jsoup.Jsoup
 
@@ -109,7 +110,7 @@ class Parser {
             }
             def keys = new HashSet(cells.length)
             builder.addResource({
-                def pluralsMap = new HashMap<String, List<QuantityEntry>>()
+                def pluralsMap = new HashMap<String, List<QuantityItem>>()
                 for (i in 0..cells.length - 1) {
                     String[] row = cells[i]
                     if (row.length < sourceInfo.mColumnsCount) {
@@ -154,7 +155,7 @@ class Parser {
                         value = value.replace("\"", "\\\"")
                     if (mConfig.escapeNewLines)
                         value = value.replace("\n", "\\n")
-                    if (mConfig.escapeBoundarySpaces && (value.indexOf(' ') == 0 || value.lastIndexOf(' ') == value.length() - 1))
+                    if (mConfig.escapeBoundarySpaces && !value.isEmpty() && (value.indexOf(' ') == 0 || value.lastIndexOf(' ') == value.length() - 1))
                         value = '"' + value + '"'
                     if (mConfig.convertTripleDotsToHorizontalEllipsis)
                         value = value.replace("...", "…")
@@ -163,17 +164,17 @@ class Parser {
 
                     if (isPluralOrArray) {
                         String pluralKeyName = name.substring(0, indexOfOpeningBrace)
-                        if (!JAVA_IDENTIFIER_REGEX.matcher(pluralKeyName).matches()){
+                        if (!JAVA_IDENTIFIER_REGEX.matcher(pluralKeyName).matches()) {
                             throw new IOException(pluralKeyName + " is not valid name, row #" + (i + 2))
                         }
                         Quantity pluralQuantity = Quantity.valueOf(name.substring(indexOfOpeningBrace + 1, indexOfClosingBrace))
 //                        if (!Quantity.values().contains(pluralQuantity))
 //                            throw new IOException(pluralQuantity + " is not valid quantity, row #" + (i + 2))
-                        List<QuantityEntry> quantitiesList = pluralsMap.get(pluralKeyName)
+                        List<QuantityItem> quantitiesList = pluralsMap.get(pluralKeyName)
                         if (quantitiesList == null)
                             quantitiesList = []
                         if (!value.isEmpty())
-                            quantitiesList.add(new QuantityEntry(pluralQuantity, value, comment))
+                            quantitiesList.add(new QuantityItem(pluralQuantity, value, comment))
                         pluralsMap.put(pluralKeyName, quantitiesList)
                         continue
                     } else if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
@@ -182,22 +183,20 @@ class Parser {
                         throw new IOException(name + " is duplicated in row #" + (i + 2))
 
                     string(stringAttrs) {
-                        if (mConfig.tagEscapingStrategy == TagEscapingStrategy.ALWAYS ||
-                                (mConfig.tagEscapingStrategy == TagEscapingStrategy.IF_TAGS_ABSENT &&
-                                        Jsoup.parse(value).body().children().isEmpty()))
-                            mkp.yield(value)
-                        else
-                            mkp.yieldUnescaped(value)
+                        yieldValue(mkp, value)
                     }
                     if (comment) {
                         mkp.comment(comment)
                     }
                 }
-                for (Map.Entry<String, List<QuantityEntry>> entry : pluralsMap) {
+                for (Map.Entry<String, List<QuantityItem>> entry : pluralsMap) {
                     plurals([name: entry.key]) {
-                        for (QuantityEntry quantityEntry : entry.value) {
+                        if (entry.value.isEmpty())
+                            throw new IOException("At least one quantity string must be defined for key: "
+                                    + entry.key + ", qualifier " + builder.mQualifier)
+                        for (QuantityItem quantityEntry : entry.value) {
                             item(quantity: quantityEntry.quantity) {
-                                mkp.yield(quantityEntry.value)
+                                yieldValue(mkp, quantityEntry.value)
                             }
                             if (quantityEntry.comment)
                                 mkp.comment(quantityEntry.comment)
@@ -206,6 +205,15 @@ class Parser {
                 }
             })
         }
+    }
+
+    private void yieldValue(MarkupBuilderHelper mkp, String value) {
+        if (mConfig.tagEscapingStrategy == TagEscapingStrategy.ALWAYS ||
+                (mConfig.tagEscapingStrategy == TagEscapingStrategy.IF_TAGS_ABSENT &&
+                        Jsoup.parse(value).body().children().isEmpty()))
+            mkp.yield(value)
+        else
+            mkp.yieldUnescaped(value)
     }
 
     private SourceInfo parseHeader(CSVParser mParser) throws IOException {
