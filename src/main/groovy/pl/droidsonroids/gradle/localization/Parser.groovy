@@ -102,6 +102,7 @@ class Parser {
     private parseCells(final SourceInfo sourceInfo) throws IOException {
         String[][] cells = mParser.getAllValues()
         def stringAttrs = new LinkedHashMap<>(2)
+        HashMap<String,Boolean> translatableArrays = new HashMap<String,Boolean>()
         for (j in 0..sourceInfo.mBuilders.length - 1) {
             XMLBuilder builder = sourceInfo.mBuilders[j]
             if (builder == null) {
@@ -109,8 +110,8 @@ class Parser {
             }
             def keys = new HashSet(cells.length)
             builder.addResource({
-                def pluralsMap = new HashMap<String, TranslatableItemSet>()
-                def arrays = new HashMap<String, TranslatableItemList>()
+                def pluralsMap = new HashMap<String, HashSet<PluralItem>>()
+                def arrays = new HashMap<String, List<StringArrayItem>>()
                 for (i in 0..cells.length - 1) {
                     String[] row = cells[i]
                     if (row.length < sourceInfo.mColumnsCount) {
@@ -133,6 +134,7 @@ class Parser {
                     if (indexOfOpeningBrace > 0 && indexOfClosingBrace == name.length() - 1) {
                         indexValue = name.substring(indexOfOpeningBrace + 1, indexOfClosingBrace)
                         resourceType = indexValue.isEmpty() ? ARRAY : PLURAL
+                        name = name.substring(0, indexOfOpeningBrace)
                     } else {
                         resourceType = STRING
                         indexValue = null
@@ -142,7 +144,12 @@ class Parser {
                     if (resourceType == STRING || resourceType == ARRAY) {
                         if (sourceInfo.mTranslatableIdx >= 0) {
                             translatable = !row[sourceInfo.mTranslatableIdx].equalsIgnoreCase('false')
-                            stringAttrs['translatable'] = translatable ? null : 'false'
+                            if (resourceType == ARRAY) {
+                                translatable &= translatableArrays.get(name, true)
+                                translatableArrays[name] = translatable
+                            }
+                            else
+                                stringAttrs['translatable'] = translatable ? null : 'false'
                         }
                         if (value.isEmpty()) {
                             if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
@@ -153,7 +160,7 @@ class Parser {
                             if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
                                 throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
                         }
-                        stringAttrs['name'] = name
+                        stringAttrs['name'] = name //TODO not used by array, optimize?
                     }
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")
@@ -171,26 +178,23 @@ class Parser {
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
 
                     if (resourceType == PLURAL || resourceType == ARRAY) {
-                        name = name.substring(0, indexOfOpeningBrace)
                         if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
                             throw new IOException(name + " is not valid name, row #" + (i + 2))
                         }
                         //TODO require only one translatable value for all list?
                         if (resourceType == ARRAY) {
-                            TranslatableItemList stringList = arrays.get(name, [])
-                            stringList.translatable &= translatable
+                            def stringList = arrays.get(name, [])
                             stringList += new StringArrayItem(value, comment)
                             arrays[name] = stringList
                         } else {
                             Quantity pluralQuantity = Quantity.valueOf(indexValue)
                             //                        if (!Quantity.values().contains(pluralQuantity))
                             //                            throw new IOException(pluralQuantity + " is not valid quantity, row #" + (i + 2))
-                            TranslatableItemSet quantitiesSet = pluralsMap.get(name, [])
+                            HashSet<PluralItem> quantitiesSet = pluralsMap.get(name, [])
                             if (!value.isEmpty()) {
                                 if (!quantitiesSet.add(new PluralItem(pluralQuantity, value, comment)))
                                     throw new IOException(name + " is duplicated in row #" + (i + 2))
                             }
-                            quantitiesSet.translatable &= translatable
                             pluralsMap[name] = quantitiesSet
                         }
                         continue
@@ -206,8 +210,8 @@ class Parser {
                         mkp.comment(comment)
                     }
                 }
-                for (Map.Entry<String, TranslatableItemSet> entry : pluralsMap) {
-                    plurals([name: entry.key, translatable: entry.value.translatable ? null : 'false']) {
+                for (Map.Entry<String, HashSet<PluralItem>> entry : pluralsMap) {
+                    plurals([name: entry.key]) {
                         if (entry.value.isEmpty())
                             throw new IOException("At least one quantity string must be defined for key: "
                                     + entry.key + ", qualifier " + builder.mQualifier)
@@ -220,8 +224,8 @@ class Parser {
                         }
                     }
                 }
-                for (Map.Entry<String, TranslatableItemList> entry : arrays) {
-                    'string-array'([name: entry.key, translatable: entry.value.translatable ? null : 'false']) {
+                for (Map.Entry<String, List<StringArrayItem>> entry : arrays) {
+                    'string-array'([name: entry.key, translatable: translatableArrays[entry.key] ? null : 'false']) {
                         for (StringArrayItem stringArrayItem : entry.value) {
                             item {
                                 yieldValue(mkp, stringArrayItem.value)
