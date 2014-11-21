@@ -10,4 +10,19 @@ class PluralItem {
     Quantity quantity
     String value
     String comment
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        PluralItem that = (PluralItem) o
+
+        if (quantity != that.quantity) return false
+
+        return true
+    }
+
+    int hashCode() {
+        return quantity.hashCode()
+    }
 }

@@ -8,9 +8,7 @@ import org.jsoup.Jsoup
 import java.text.Normalizer
 import java.util.regex.Pattern
 
-import static pl.droidsonroids.gradle.localization.ResourceType.ARRAY
-import static pl.droidsonroids.gradle.localization.ResourceType.PLURAL
-import static pl.droidsonroids.gradle.localization.ResourceType.STRING
+import static pl.droidsonroids.gradle.localization.ResourceType.*
 
 /**
  * Class containing CSV parser logic
@@ -104,7 +102,6 @@ class Parser {
     private parseCells(final SourceInfo sourceInfo) throws IOException {
         String[][] cells = mParser.getAllValues()
         def stringAttrs = new LinkedHashMap<>(2)
-
         for (j in 0..sourceInfo.mBuilders.length - 1) {
             XMLBuilder builder = sourceInfo.mBuilders[j]
             if (builder == null) {
@@ -112,8 +109,8 @@ class Parser {
             }
             def keys = new HashSet(cells.length)
             builder.addResource({
-                def pluralsMap = new HashMap<TranslatableNode, List<PluralItem>>()
-                def arrays = new HashMap<TranslatableNode, List<StringArrayItem>>()
+                def pluralsMap = new HashMap<String, TranslatableItemSet>()
+                def arrays = new HashMap<String, TranslatableItemList>()
                 for (i in 0..cells.length - 1) {
                     String[] row = cells[i]
                     if (row.length < sourceInfo.mColumnsCount) {
@@ -156,7 +153,7 @@ class Parser {
                             if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
                                 throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
                         }
-                        stringAttrs['name']= name
+                        stringAttrs['name'] = name
                     }
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")
@@ -178,20 +175,23 @@ class Parser {
                         if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
                             throw new IOException(name + " is not valid name, row #" + (i + 2))
                         }
-
-                        def translatableNode = new TranslatableNode(name, translatable) //TODO or all translatable values
+                        //TODO require only one translatable value for all list?
                         if (resourceType == ARRAY) {
-                            List<StringArrayItem> stringList = arrays.get(translatableNode, [])
+                            TranslatableItemList stringList = arrays.get(name, [])
+                            stringList.translatable &= translatable
                             stringList += new StringArrayItem(value, comment)
-                            arrays[translatableNode] = stringList
+                            arrays[name] = stringList
                         } else {
                             Quantity pluralQuantity = Quantity.valueOf(indexValue)
                             //                        if (!Quantity.values().contains(pluralQuantity))
                             //                            throw new IOException(pluralQuantity + " is not valid quantity, row #" + (i + 2))
-                            List<PluralItem> quantitiesList = pluralsMap.get(translatableNode, [])
-                            if (!value.isEmpty())
-                                quantitiesList += new PluralItem(pluralQuantity, value, comment)
-                            pluralsMap[translatableNode] = quantitiesList
+                            TranslatableItemSet quantitiesSet = pluralsMap.get(name, [])
+                            if (!value.isEmpty()) {
+                                if (!quantitiesSet.add(new PluralItem(pluralQuantity, value, comment)))
+                                    throw new IOException(name + " is duplicated in row #" + (i + 2))
+                            }
+                            quantitiesSet.translatable &= translatable
+                            pluralsMap[name] = quantitiesSet
                         }
                         continue
                     } else if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
@@ -206,11 +206,11 @@ class Parser {
                         mkp.comment(comment)
                     }
                 }
-                for (Map.Entry<TranslatableNode, List<PluralItem>> entry : pluralsMap) {
-                    plurals([name: entry.key.name, translatable: entry.key.translatable ? null : 'false']) {
+                for (Map.Entry<String, TranslatableItemSet> entry : pluralsMap) {
+                    plurals([name: entry.key, translatable: entry.value.translatable ? null : 'false']) {
                         if (entry.value.isEmpty())
                             throw new IOException("At least one quantity string must be defined for key: "
-                                    + entry.key.name + ", qualifier " + builder.mQualifier)
+                                    + entry.key + ", qualifier " + builder.mQualifier)
                         for (PluralItem quantityEntry : entry.value) {
                             item(quantity: quantityEntry.quantity) {
                                 yieldValue(mkp, quantityEntry.value)
@@ -220,8 +220,8 @@ class Parser {
                         }
                     }
                 }
-                for (Map.Entry<TranslatableNode, List<StringArrayItem>> entry : arrays) {
-                    'string-array'([name: entry.key.name, translatable: entry.key.translatable ? null : 'false']) {
+                for (Map.Entry<String, TranslatableItemList> entry : arrays) {
+                    'string-array'([name: entry.key, translatable: entry.value.translatable ? null : 'false']) {
                         for (StringArrayItem stringArrayItem : entry.value) {
                             item {
                                 yieldValue(mkp, stringArrayItem.value)
