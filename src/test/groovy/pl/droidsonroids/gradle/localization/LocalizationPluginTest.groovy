@@ -37,13 +37,13 @@ class LocalizationPluginTest extends GroovyTestCase {
     }
 
     private static void parseTestCSV(ConfigExtension config) throws IOException {
-        def project = ProjectBuilder.builder().withProjectDir(new File('/tmp/a')).build()
+        def project = ProjectBuilder.builder().build()
         def resDir = project.file('src/main/res')
         try {
             new Parser(config, resDir).parseCSV()
         }
         finally {
-            //resDir.deleteDir()
+            resDir.deleteDir()
         }
     }
 }
