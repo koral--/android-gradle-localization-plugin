@@ -174,6 +174,7 @@ class Parser {
                         value = '"' + value + '"'
                     if (mConfig.convertTripleDotsToHorizontalEllipsis)
                         value = value.replace("...", "…")
+                    value = value.replace("?","\\?")
                     if (mConfig.normalizationForm)
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
 
