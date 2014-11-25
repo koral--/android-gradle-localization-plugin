@@ -142,6 +142,7 @@ class Parser {
 
                     def translatable = true
                     if (resourceType == STRING || resourceType == ARRAY) {
+                        stringAttrs['name'] = name //TODO not used by array, optimize?
                         if (sourceInfo.mTranslatableIdx >= 0) {
                             translatable = !row[sourceInfo.mTranslatableIdx].equalsIgnoreCase('false')
                             if (resourceType == ARRAY) {
@@ -160,7 +161,6 @@ class Parser {
                             if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
                                 throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
                         }
-                        stringAttrs['name'] = name //TODO not used by array, optimize?
                     }
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")

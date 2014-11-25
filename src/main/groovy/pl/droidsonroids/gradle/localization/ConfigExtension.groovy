@@ -14,7 +14,6 @@ class ConfigExtension {
     boolean escapeApostrophes = true
     boolean escapeQuotes = true
     boolean escapeNewLines = true
-    //TODO add info about removal boolean escapeBoundarySpaces = true
     boolean convertTripleDotsToHorizontalEllipsis = true
     boolean escapeSlashes = true
     TagEscapingStrategy tagEscapingStrategy = TagEscapingStrategy.IF_TAGS_ABSENT
