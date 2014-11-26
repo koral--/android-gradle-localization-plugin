@@ -11,9 +11,10 @@ import java.util.regex.Pattern
  * Class containing CSV parser logic
  */
 class Parser {
-    private static
-    final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
-    private static final String NAME = "name", TRANSLATABLE = "translatable", COMMENT = "comment"
+    private static final Pattern JAVA_IDENTIFIER_REGEX =
+            Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
+    private static String NAME , TRANSLATABLE , COMMENT
+    private static boolean SKIP_VALID_NAME,SKIP_DUPLICATED_NAME
     private static final int BUFFER_SIZE = 128 * 1024
     private final CSVParser mParser
     private final ConfigExtension mConfig
@@ -21,6 +22,14 @@ class Parser {
     private final Reader mReader
 
     Parser(ConfigExtension config, File resDir) {
+        //3 columns reserved Config
+        NAME=config.name
+        TRANSLATABLE=config.translatable
+        COMMENT=config.comment
+
+        SKIP_VALID_NAME=config.skipValidName
+        SKIP_DUPLICATED_NAME=config.skipDuplicatedName
+
         Set<Object> csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand] as Set
         csvSources.remove(null)
         if (csvSources.size() != 1)
@@ -69,7 +78,7 @@ class Parser {
         XMLBuilder(String qualifier) {
             def defaultValues = qualifier == mConfig.defaultColumnName
             String valuesDirName = defaultValues ? 'values' : 'values-' + qualifier
-            File valuesDir = new File(mResDir, valuesDirName)
+            File valuesDir = new File(mResDir, valuesDirName.toLowerCase())
             if (!valuesDir.isDirectory()){
                 valuesDir.mkdirs()
             }
@@ -105,6 +114,7 @@ class Parser {
             if (builder == null){
                 continue
             }
+            //the key indicate all language string
             def keys = new HashSet(cells.length)
             builder.addResource({
                 for (i in 0..cells.length - 1) {
@@ -117,10 +127,20 @@ class Parser {
                         row = extendedRow
                     }
                     def name = row[sourceInfo.mNameIdx]
-                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
-                        throw new IOException(name + " is not valid name, row #" + (i + 2))
-                    if (!keys.add(name))
-                        throw new IOException(name + " is duplicated in row #" + (i + 2))
+                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()){
+                        if(SKIP_VALID_NAME){
+                            continue
+                        }else{
+                            throw new IOException(name + " is not valid name, row #" + (i + 2))
+                        }
+                    }
+                    if (!keys.add(name)){
+                        if(SKIP_DUPLICATED_NAME){
+                            continue
+                        }else{
+                            throw new IOException(name + " is duplicated in row #" + (i + 2))
+                        }
+                    }
                     attrs.put('name', name)
                     def translatable = true
                     if (sourceInfo.mTranslatableIdx >= 0) {
@@ -132,9 +152,11 @@ class Parser {
                         if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
                             continue
                         if (!mConfig.allowEmptyTranslations)
-                            throw new IOException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 2))
+                            throw new IOException(name + " is not translated to locale " +
+                                    builder.mQualifier + ", row #" + (i + 2))
                     } else {
-                        if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
+                        if (!translatable && !mConfig.allowNonTranslatableTranslation &&
+                                builder.mQualifier != mConfig.defaultColumnName)
                             throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
                     }
                     if (mConfig.escapeSlashes)

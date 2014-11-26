@@ -27,4 +27,10 @@ class ConfigExtension {
     CSVStrategy csvStrategy
     String outputFileName = 'strings.xml'
     String outputIndent = '  '
+    String name="name";
+    String translatable="translatable";
+    String comment="comment"
+    boolean skipValidName=true
+    boolean skipDuplicatedName=true
+
 }
