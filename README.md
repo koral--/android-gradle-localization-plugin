@@ -32,7 +32,7 @@ Generation has to be invoked as additional gradle task.
  ```
 2. Apply plugin and add configuration to `build.gradle` of the application, eg:
  ```
- apply plugin: 'localization'
+ apply plugin: 'pl.droidsonroids.localization'
  localization
      {
          csvFile=file('translations.csv')
@@ -99,8 +99,6 @@ something already escaped in CSV:
 * `escapeApostrophes` - default=`true`, if set to false apostrophes (`'`) won't be escaped
 * `escapeQuotes` - default=`true`, if set to false double quotes (`"`)  won't be escaped
 * `escapeNewLines` - default=`true`, if set to false newline characters won't be escaped
-* `escapeBoundarySpaces` - default=`true`, if set to false leading and trailing spaces
-won't be escaped so they will be effectively removed at compile time
 * `convertTripleDotsToHorizontalEllipsis` - default=`true`, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
 * `escapeSlashes` - default=`true`, if set to false slashes (`\`) won't be escaped
 * `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
@@ -122,7 +120,7 @@ non-translatable but translated are permitted
 * `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted
 * `outputFileName` - default=`strings.xml`, XML file name (with extension) which should be generated as an output
 * `outputIndent` - default=`  `(two spaces), character(s) used to indent each line in output XML files
- 
+
 ##License
 
 MIT License<br>
