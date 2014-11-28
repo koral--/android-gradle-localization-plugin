@@ -37,6 +37,10 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
+def getBintrayApiKey() {
+    return hasProperty('BINTRAY_API_KEY') ? BINTRAY_API_KEY : ""
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
