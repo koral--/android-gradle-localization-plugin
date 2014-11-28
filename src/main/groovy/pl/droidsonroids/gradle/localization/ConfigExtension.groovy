@@ -32,5 +32,6 @@ class ConfigExtension {
     String comment="comment"
     boolean skipValidName=true
     boolean skipDuplicatedName=true
+    File file;
 
 }

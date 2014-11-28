@@ -2,6 +2,10 @@ package pl.droidsonroids.gradle.localization
 
 import groovy.xml.MarkupBuilder
 import org.apache.commons.csv.CSVParser
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.xssf.usermodel.XSSFRow
+import org.apache.poi.xssf.usermodel.XSSFSheet
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.jsoup.Jsoup
 
 import java.text.Normalizer
@@ -20,12 +24,16 @@ class Parser {
     private final ConfigExtension mConfig
     private final File mResDir
     private final Reader mReader
+    //TODO need
+    private File file;
 
     Parser(ConfigExtension config, File resDir) {
         //3 columns reserved Config
         NAME=config.name
         TRANSLATABLE=config.translatable
         COMMENT=config.comment
+
+        file=config.file
 
         SKIP_VALID_NAME=config.skipValidName
         SKIP_DUPLICATED_NAME=config.skipDuplicatedName
@@ -101,13 +109,24 @@ class Parser {
 
     void parseCSV() throws IOException {
         mReader.withReader {
-            parseCells(parseHeader(mParser))
+
+            if(file==null){
+                def header = parseHeader(mParser.getLine())
+                parseCells(header, mParser.getAllValues())
+            }else{
+                def all = getAll(file)
+
+                def line = getHeaderLine(all)
+                def header = parseHeader(line)
+                parseCells(header,getBodys(all))
+
+            }
+
         }
     }
 
 
-    private parseCells(final SourceInfo sourceInfo) throws IOException {
-        String[][] cells = mParser.getAllValues()
+    private parseCells(final SourceInfo sourceInfo, String[][] cells) throws IOException {
         def attrs = new LinkedHashMap<>(2)
         for (j in 0..sourceInfo.mBuilders.length - 1) {
             def builder = sourceInfo.mBuilders[j]
@@ -119,6 +138,9 @@ class Parser {
             builder.addResource({
                 for (i in 0..cells.length - 1) {
                     def row = cells[i]
+                    if(row==null){
+                        continue
+                    }
                     if (row.size() < sourceInfo.mColumnsCount) {
                         def extendedRow = new String[sourceInfo.mColumnsCount]
                         System.arraycopy(row, 0, extendedRow, 0, row.size())
@@ -188,8 +210,7 @@ class Parser {
         }
     }
 
-    private SourceInfo parseHeader(CSVParser mParser) throws IOException {
-        def headerLine = mParser.getLine()
+    private SourceInfo parseHeader(headerLine) throws IOException {
         if (headerLine == null || headerLine.size() < 2)
             throw new IOException("Invalid CSV header: " + headerLine)
         List<String> header = Arrays.asList(headerLine)
@@ -213,5 +234,45 @@ class Parser {
         def translatableIdx = header.indexOf(TRANSLATABLE)
         def commentIdx = header.indexOf(COMMENT)
         new SourceInfo(builders, keyIdx, translatableIdx, commentIdx, header.size())
+    }
+
+    public String[][] getAll(File file) {
+        Workbook book = new XSSFWorkbook(new FileInputStream(file));
+        //得到Excel第一个sheet
+        XSSFSheet se = book.getSheetAt(0)
+
+        String[][] result = new String[se.lastRowNum][];
+
+        for (int i = 0; i < se.lastRowNum; i++) {
+            XSSFRow row = se.getRow(i)
+            result[i] = new String[row.lastCellNum];
+            for (int j = 0; j < row.lastCellNum; j++) {
+                def cell = row.getCell(j)
+                result[i][j] = cell.toString();
+            }
+        }
+        return result;
+    }
+
+    public String[] getHeaderLine(String[][] all) {
+        String[] result = new String[all[0].length];
+
+        for (int i = 0; i < all[0].length; i++) {
+            result[i] = all[0][i]
+        }
+        return result
+    }
+
+    public String[][] getBodys(String[][] all) {
+        String[][] result = new String[all.length][];
+
+        for (int i = 1; i < all.length; i++) {
+            def length = all[i].length
+            result[i - 1] = new String[length];
+            for (int j = 0; j < length; j++) {
+                result[i - 1][j] = all[i][j]
+            }
+        }
+        return result;
     }
 }

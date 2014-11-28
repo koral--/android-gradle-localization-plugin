@@ -40,11 +40,30 @@ class LocalizationPluginTest extends GroovyTestCase {
     private static void parseTestCSV(ConfigExtension config) throws IOException {
         def project = ProjectBuilder.builder().build()
         def resDir = project.file('src/main/res')
+        resDir=new File("src/test/res")
         try {
             new Parser(config, resDir).parseCSV()
         }
         finally {
-            resDir.deleteDir()
+//            resDir.deleteDir()
         }
     }
+
+    @Test
+    void testXls() {
+        def name = 'language_iOS_append_ALL_340_333_rev.xlsx'
+        def file = new File(getClass().getResource(name).getPath())
+        ConfigExtension config=new ConfigExtension()
+        config.allowEmptyTranslations=true
+        config.file=file
+        config.csvFile=file
+        config.defaultColumnName="EN"
+        config.name="Android"
+        config.ignorableColumns.add("WinPhone")
+        config.ignorableColumns.add("iOS")
+        config.ignorableColumns.add("END")
+
+        parseTestCSV(config)
+    }
+
 }
