@@ -85,7 +85,7 @@ Command string should be specified like for [Runtime#exec()](http://docs.oracle.
 Standard error of the command is redirected to the standard error of the process executing gradle,
 so it could be seen in the gradle console.
 
-CSV format:
+#### CSV format:
 * `defaultColumnName` - default=`'default'`, column name which corresponds to default localization
 (`values` folder)
 * `csvStrategy` - default=`null` (library default strategy, equivalent of 
@@ -112,7 +112,7 @@ possible values:
    &lt;b&gt;bold&lt;/b&gt;} will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
    See [JSoup](http://jsoup.org) - library used to detect tags
 
-Advanced options:
+#### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
 contain column names eg. `['Section', 'Notes']`
 * `allowNonTranslatableTranslation` - default=`false`, if set to true resources marked
@@ -120,6 +120,9 @@ non-translatable but translated are permitted
 * `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted
 * `outputFileName` - default=`strings.xml`, XML file name (with extension) which should be generated as an output
 * `outputIndent` - default=`  `(two spaces), character(s) used to indent each line in output XML files
+
+#### Migration from previous versions:
+Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to true. Currently strings are always escaped when corresponding *parsed* CSV ceil contains leading or trailing spaces, but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default. If you want to include mentioned spaces in output set appropriate `csvStrategy`.
 
 ##License
 
