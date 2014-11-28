@@ -120,6 +120,6 @@ plugindev {
 
 bintray {
     user = POM_DEVELOPER_ID
-    key = BINTRAY_API_KEY
+    key = getBintrayApiKey()
     pkg.repo = 'maven'
 }
