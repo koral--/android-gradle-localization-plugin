@@ -2,10 +2,6 @@ package pl.droidsonroids.gradle.localization
 
 import groovy.xml.MarkupBuilder
 import org.apache.commons.csv.CSVParser
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFRow
-import org.apache.poi.xssf.usermodel.XSSFSheet
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.jsoup.Jsoup
 
 import java.text.Normalizer
@@ -17,40 +13,49 @@ import java.util.regex.Pattern
 class Parser {
     private static final Pattern JAVA_IDENTIFIER_REGEX =
             Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
-    private static String NAME , TRANSLATABLE , COMMENT
-    private static boolean SKIP_VALID_NAME,SKIP_DUPLICATED_NAME
+    private static String NAME, TRANSLATABLE, COMMENT
+    private static boolean SKIP_VALID_NAME, SKIP_DUPLICATED_NAME
     private static final int BUFFER_SIZE = 128 * 1024
-    private final CSVParser mParser
+    private final CSVParser csvParser
+    private final XlsxParser xlsxParser;
     private final ConfigExtension mConfig
     private final File mResDir
     private final Reader mReader
-    //TODO need
-    private File file;
 
     Parser(ConfigExtension config, File resDir) {
         //3 columns reserved Config
-        NAME=config.name
-        TRANSLATABLE=config.translatable
-        COMMENT=config.comment
+        NAME = config.name
+        TRANSLATABLE = config.translatable
+        COMMENT = config.comment
 
-        file=config.file
+        SKIP_VALID_NAME = config.skipValidName
+        SKIP_DUPLICATED_NAME = config.skipDuplicatedName
 
-        SKIP_VALID_NAME=config.skipValidName
-        SKIP_DUPLICATED_NAME=config.skipDuplicatedName
-
-        Set<Object> csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand] as Set
-        csvSources.remove(null)
-        if (csvSources.size() != 1)
+        Set<Object> sources = [config.csvFileURI, config.sourceFile, config.csvGenerationCommand] as Set
+        sources.remove(null)
+        if (sources.size() != 1) {
             throw new IllegalArgumentException("Exactly one source must be defined")
+        }
+        String extension = "csv";
         Reader reader
         if (config.csvGenerationCommand != null) {
             def split = config.csvGenerationCommand.split('\\s+')
             def redirect = ProcessBuilder.Redirect.INHERIT
             def process = new ProcessBuilder(split).redirectError(redirect).start()
             reader = new InputStreamReader(process.getInputStream())
-        } else if (config.csvFile != null){
-            reader = new FileReader(config.csvFile)
+        } else if (config.sourceFile != null) {
+            reader = new FileReader(config.sourceFile)
             // if (config.csvFileURI!=null)
+            try {
+                String fileName = config.sourceFile.getName();
+                if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
+                    extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+                } else {
+                    extension = "";
+                }
+            } catch (Exception e) {
+                e.printStackTrace()
+            }
         } else {
             reader = new InputStreamReader(new URL(config.csvFileURI).openStream())
         }
@@ -58,8 +63,12 @@ class Parser {
         mReader = reader
         mResDir = resDir
 
-        def parser = new CSVParser(reader, config.csvStrategy)
-        mParser = config.csvStrategy ? parser : new CSVParser(reader)
+        if("csv".equals(extension)){
+            def parser = new CSVParser(reader, config.csvStrategy)
+            csvParser = config.csvStrategy ? parser : new CSVParser(reader)
+        }else{
+            xlsxParser= new XlsxParser(config.sourceFile)
+        }
         mConfig = config
     }
 
@@ -87,7 +96,7 @@ class Parser {
             def defaultValues = qualifier == mConfig.defaultColumnName
             String valuesDirName = defaultValues ? 'values' : 'values-' + qualifier
             File valuesDir = new File(mResDir, valuesDirName.toLowerCase())
-            if (!valuesDir.isDirectory()){
+            if (!valuesDir.isDirectory()) {
                 valuesDir.mkdirs()
             }
             File valuesFile = new File(valuesDir, mConfig.outputFileName)
@@ -109,19 +118,13 @@ class Parser {
 
     void parseCSV() throws IOException {
         mReader.withReader {
-
-            if(file==null){
-                def header = parseHeader(mParser.getLine())
-                parseCells(header, mParser.getAllValues())
-            }else{
-                def all = getAll(file)
-
-                def line = getHeaderLine(all)
-                def header = parseHeader(line)
-                parseCells(header,getBodys(all))
-
+            if (csvParser != null) {
+                def header = parseHeader(csvParser.getLine())
+                parseCells(header, csvParser.getAllValues())
+            } else {
+                def header = parseHeader(xlsxParser.getLine())
+                parseCells(header, xlsxParser.getAllValues())
             }
-
         }
     }
 
@@ -130,7 +133,7 @@ class Parser {
         def attrs = new LinkedHashMap<>(2)
         for (j in 0..sourceInfo.mBuilders.length - 1) {
             def builder = sourceInfo.mBuilders[j]
-            if (builder == null){
+            if (builder == null) {
                 continue
             }
             //the key indicate all language string
@@ -138,7 +141,7 @@ class Parser {
             builder.addResource({
                 for (i in 0..cells.length - 1) {
                     def row = cells[i]
-                    if(row==null){
+                    if (row == null) {
                         continue
                     }
                     if (row.size() < sourceInfo.mColumnsCount) {
@@ -149,17 +152,17 @@ class Parser {
                         row = extendedRow
                     }
                     def name = row[sourceInfo.mNameIdx]
-                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()){
-                        if(SKIP_VALID_NAME){
+                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
+                        if (SKIP_VALID_NAME) {
                             continue
-                        }else{
+                        } else {
                             throw new IOException(name + " is not valid name, row #" + (i + 2))
                         }
                     }
-                    if (!keys.add(name)){
-                        if(SKIP_DUPLICATED_NAME){
+                    if (!keys.add(name)) {
+                        if (SKIP_DUPLICATED_NAME) {
                             continue
-                        }else{
+                        } else {
                             throw new IOException(name + " is duplicated in row #" + (i + 2))
                         }
                     }
@@ -215,17 +218,19 @@ class Parser {
             throw new IOException("Invalid CSV header: " + headerLine)
         List<String> header = Arrays.asList(headerLine)
         def keyIdx = header.indexOf(NAME)
-        if (keyIdx == -1)
+        if (keyIdx == -1) {
             throw new IOException("'name' column not present")
-        if (header.indexOf(mConfig.defaultColumnName) == -1)
+        }
+        if (header.indexOf(mConfig.defaultColumnName) == -1) {
             throw new IOException("Default locale column not present")
+        }
         def builders = new XMLBuilder[header.size()]
 
         def reservedColumns = [NAME, COMMENT, TRANSLATABLE]
         reservedColumns.addAll(mConfig.ignorableColumns)
         def i = 0
         for (columnName in header) {
-            if (!(columnName in reservedColumns)){
+            if (!(columnName in reservedColumns)) {
                 builders[i] = new XMLBuilder(columnName)
             }
             i++
@@ -234,45 +239,5 @@ class Parser {
         def translatableIdx = header.indexOf(TRANSLATABLE)
         def commentIdx = header.indexOf(COMMENT)
         new SourceInfo(builders, keyIdx, translatableIdx, commentIdx, header.size())
-    }
-
-    public String[][] getAll(File file) {
-        Workbook book = new XSSFWorkbook(new FileInputStream(file));
-        //得到Excel第一个sheet
-        XSSFSheet se = book.getSheetAt(0)
-
-        String[][] result = new String[se.lastRowNum][];
-
-        for (int i = 0; i < se.lastRowNum; i++) {
-            XSSFRow row = se.getRow(i)
-            result[i] = new String[row.lastCellNum];
-            for (int j = 0; j < row.lastCellNum; j++) {
-                def cell = row.getCell(j)
-                result[i][j] = cell.toString();
-            }
-        }
-        return result;
-    }
-
-    public String[] getHeaderLine(String[][] all) {
-        String[] result = new String[all[0].length];
-
-        for (int i = 0; i < all[0].length; i++) {
-            result[i] = all[0][i]
-        }
-        return result
-    }
-
-    public String[][] getBodys(String[][] all) {
-        String[][] result = new String[all.length][];
-
-        for (int i = 1; i < all.length; i++) {
-            def length = all[i].length
-            result[i - 1] = new String[length];
-            for (int j = 0; j < length; j++) {
-                result[i - 1][j] = all[i][j]
-            }
-        }
-        return result;
     }
 }

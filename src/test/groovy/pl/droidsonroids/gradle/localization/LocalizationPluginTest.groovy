@@ -9,7 +9,7 @@ class LocalizationPluginTest extends GroovyTestCase {
     @Test
     void testCsvFileConfig() {
         def config = new ConfigExtension()
-        config.csvFile = new File(getClass().getResource('valid.csv').getPath())
+        config.sourceFile = new File(getClass().getResource('valid.csv').getPath())
         parseTestCSV(config)
     }
 
@@ -54,9 +54,8 @@ class LocalizationPluginTest extends GroovyTestCase {
         def name = 'language_iOS_append_ALL_340_333_rev.xlsx'
         def file = new File(getClass().getResource(name).getPath())
         ConfigExtension config=new ConfigExtension()
+        config.sourceFile=file
         config.allowEmptyTranslations=true
-        config.file=file
-        config.csvFile=file
         config.defaultColumnName="EN"
         config.name="Android"
         config.ignorableColumns.add("WinPhone")
