@@ -29,18 +29,6 @@ dependencies {
 group = GROUP
 version = VERSION_NAME
 
-def getRepositoryUsername() {
-    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
-}
-
-def getRepositoryPassword() {
-    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
-}
-
-def getBintrayApiKey() {
-    return hasProperty('BINTRAY_API_KEY') ? BINTRAY_API_KEY : ""
-}
-
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -49,10 +37,10 @@ uploadArchives {
             }
 
             repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }
             snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }
 
             pom.groupId = GROUP
@@ -115,11 +103,12 @@ plugindev {
     authorEmail POM_EMAIL
     projectUrl POM_URL
     projectInceptionYear POM_INCEPTION_YEAR
+    pluginDescription POM_DESCRIPTION
     done()
 }
 
 bintray {
     user = POM_DEVELOPER_ID
-    key = getBintrayApiKey()
+    key = BINTRAY_API_KEY
     pkg.repo = 'maven'
 }
