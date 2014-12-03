@@ -27,7 +27,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
 
 ### All versions of gradle
 1. Add dependency to the __top-level__ `build.gradle` file.
- Your file should look like this:
+
  ```
   buildscript {
      repositories {
