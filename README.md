@@ -15,24 +15,39 @@ Generation has to be invoked as additional gradle task.
  * syntax validation - duplicated, empty, invalid names detection
  * comments
   
-## Usage
+## Applying plugin
+### Gradle 2.1+
+In whichever `build.gradle` file.
+```
+plugins {
+  id 'pl.droidsonroids.localization' version '1.0.7'
+}
+```
+Note: exact version number must be specified, `+` cannot be used as wildcard.
+
+### All versions of gradle
 1. Add dependency to the __top-level__ `build.gradle` file.
  Your file should look like this:
  ```
- 
   buildscript {
      repositories {
          mavenCentral()
+         jcenter()
      }
      dependencies {
          classpath 'com.android.tools.build:gradle:0.14.+'
-         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.+'
+         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.7'
      }
  }
  ```
+ Note: `mavenCentral()` and/or `jcenter()` repository can be specified, `+` can be used as wildcard in version number.
 2. Apply plugin and add configuration to `build.gradle` of the application, eg:
  ```
  apply plugin: 'pl.droidsonroids.localization'
+ ```
+ 
+ ## Configuration
+ ```
  localization
      {
          csvFile=file('translations.csv')
@@ -43,8 +58,9 @@ Generation has to be invoked as additional gradle task.
      }
  ```
  `csvFileURI` can be any valid URI, not necessarily Google Docs' one 
- 
-3. Invoke `localization` gradle task. Task may be invoked from commandline or from Android Studio GUI.
+
+## Usage 
+Invoke `localization` gradle task. Task may be invoked from commandline or from Android Studio GUI.
  * from commandline: `./gradlew localization` (or `gradlew.bat localization` on Windows)
  * from GUI: menu `View->Tool Windows->Gradle` and double click `localization`<br>
  
