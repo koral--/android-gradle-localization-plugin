@@ -25,7 +25,7 @@ plugins {
 ```
 Note: exact version number must be specified, `+` cannot be used as wildcard.
 
-### All versions of gradle
+### All versions of Gradle
 1. Add dependency to the __top-level__ `build.gradle` file.
 
  ```
