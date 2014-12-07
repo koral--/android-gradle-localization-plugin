@@ -23,7 +23,7 @@ dependencies {
     compile localGroovy()
     compile 'org.marketcetera.fork:commons-csv:2.4.1'
     compile 'org.jsoup:jsoup:1.8.1'
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
 }
 
 group = GROUP
