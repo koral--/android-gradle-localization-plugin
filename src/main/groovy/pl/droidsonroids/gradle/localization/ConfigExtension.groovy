@@ -30,6 +30,6 @@ class ConfigExtension {
     String name="name";
     String translatable="translatable";
     String comment="comment"
-    boolean skipValidName=true
+    boolean skipInvalidName=true
     boolean skipDuplicatedName=true
 }

@@ -28,7 +28,7 @@ class Parser {
         TRANSLATABLE = config.translatable
         COMMENT = config.comment
 
-        SKIP_VALID_NAME = config.skipValidName
+        SKIP_VALID_NAME = config.skipInvalidName
         SKIP_DUPLICATED_NAME = config.skipDuplicatedName
 
         Set<Object> sources = [config.csvFileURI, config.sourceFile, config.csvGenerationCommand] as Set
@@ -63,11 +63,11 @@ class Parser {
         mReader = reader
         mResDir = resDir
 
-        if("csv".equals(extension)){
+        if ("csv".equals(extension)) {
             def parser = new CSVParser(reader, config.csvStrategy)
             csvParser = config.csvStrategy ? parser : new CSVParser(reader)
-        }else{
-            xlsxParser= new XlsxParser(config.sourceFile)
+        } else {
+            xlsxParser = new XlsxParser(config.sourceFile)
         }
         mConfig = config
     }
@@ -94,8 +94,17 @@ class Parser {
 
         XMLBuilder(String qualifier) {
             def defaultValues = qualifier == mConfig.defaultColumnName
-            String valuesDirName = defaultValues ? 'values' : 'values-' + qualifier
-            File valuesDir = new File(mResDir, valuesDirName.toLowerCase())
+            String valuesDirName;
+            if (defaultValues) {
+                valuesDirName = "values";
+            } else {
+                def split = qualifier.split("_")
+                //zh-rCN
+                def s = split.length == 2 ? split[0].toLowerCase() + "-" + "r" +
+                        split[1].toUpperCase() : qualifier.toLowerCase()
+                valuesDirName = "values" + "-" + s
+            }
+            File valuesDir = new File(mResDir, valuesDirName)
             if (!valuesDir.isDirectory()) {
                 valuesDir.mkdirs()
             }
