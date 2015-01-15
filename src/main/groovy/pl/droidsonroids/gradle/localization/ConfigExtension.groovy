@@ -19,6 +19,9 @@ class ConfigExtension {
     TagEscapingStrategy tagEscapingStrategy = TagEscapingStrategy.IF_TAGS_ABSENT
     Normalizer.Form normalizationForm = Normalizer.Form.NFC
     String defaultColumnName = 'default'
+    String nameColumnName = 'name'
+    String translatableColumnName = 'translatable'
+    String commentColumnName = 'comment'
     File csvFile
     String csvFileURI
     String csvGenerationCommand
@@ -26,4 +29,6 @@ class ConfigExtension {
     CSVStrategy csvStrategy
     String outputFileName = 'strings.xml'
     String outputIndent = '  '
+    boolean skipInvalidName
+    boolean skipDuplicatedName
 }
