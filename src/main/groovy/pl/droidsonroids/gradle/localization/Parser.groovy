@@ -14,11 +14,10 @@ import static pl.droidsonroids.gradle.localization.ResourceType.*
  * Class containing CSV parser logic
  */
 class Parser {
-    private static
-    final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
-    private static final String NAME = "name", TRANSLATABLE = "translatable", COMMENT = "comment"
+    private static final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
     private static final int BUFFER_SIZE = 128 * 1024
-    private final CSVParser mParser
+    private final CSVParser csvParser
+    private final XlsxParser xlsxParser
     private final ConfigExtension mConfig
     private final File mResDir
     private final Reader mReader
@@ -26,8 +25,10 @@ class Parser {
     Parser(ConfigExtension config, File resDir) {
         def csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand] as Set
         csvSources.remove(null)
-        if (csvSources.size() != 1)
+        if (csvSources.size() != 1){
             throw new IllegalArgumentException("Exactly one source must be defined")
+        }
+        final boolean isCsv //TODO rename
         Reader reader
         if (config.csvGenerationCommand != null) {
             def split = config.csvGenerationCommand.split('\\s+')
@@ -36,6 +37,7 @@ class Parser {
             reader = new InputStreamReader(process.getInputStream())
         } else if (config.csvFile != null) {
             reader = new FileReader(config.csvFile)
+            isCsv = config.csvFile.getName().endsWith(".csv")
         } else { // if (config.csvFileURI!=null)
             reader = new InputStreamReader(new URL(config.csvFileURI).openStream())
         }
@@ -43,8 +45,11 @@ class Parser {
         mReader = reader
         mResDir = resDir
 
-        def parser = new CSVParser(reader, config.csvStrategy)
-        mParser = config.csvStrategy ? parser : new CSVParser(reader)
+        if(isCsv){
+            csvParser = config.csvStrategy ? new CSVParser(reader, config.csvStrategy) : new CSVParser(reader)
+        }else{
+            xlsxParser= new XlsxParser(config.csvFile)
+        }
         mConfig = config
     }
 
@@ -94,20 +99,24 @@ class Parser {
 
     void parseCSV() throws IOException {
         mReader.withReader {
-            parseCells(parseHeader(mParser))
+            if (csvParser != null) {
+                def header = parseHeader(csvParser.getLine())
+                parseCells(header, csvParser.getAllValues())
+            } else {
+                def header = parseHeader(xlsxParser.getLine())
+                parseCells(header, xlsxParser.getAllValues())
+            }
         }
     }
 
-
-    private parseCells(final SourceInfo sourceInfo) throws IOException {
-        String[][] cells = mParser.getAllValues()
-        def stringAttrs = new LinkedHashMap<>(2)
-        HashMap<String,Boolean> translatableArrays = new HashMap<String,Boolean>()
+    private parseCells(final SourceInfo sourceInfo, String[][] cells) throws IOException {
+        def attrs = new LinkedHashMap<>(2)
         for (j in 0..sourceInfo.mBuilders.length - 1) {
-            XMLBuilder builder = sourceInfo.mBuilders[j]
+            def builder = sourceInfo.mBuilders[j]
             if (builder == null) {
                 continue
             }
+            //the key indicate all language string
             def keys = new HashSet(cells.length)
             builder.addResource({
                 def pluralsMap = new HashMap<String, HashSet<PluralItem>>()
@@ -178,10 +187,12 @@ class Parser {
                     if (mConfig.normalizationForm)
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
 
+                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
+                        if (mConfig.skipInvalidName)
+                            continue
+                        throw new IOException(name + " is not valid name, row #" + (i + 2))
+                    }
                     if (resourceType == PLURAL || resourceType == ARRAY) {
-                        if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
-                            throw new IOException(name + " is not valid name, row #" + (i + 2))
-                        }
                         //TODO require only one translatable value for all list?
                         if (resourceType == ARRAY) {
                             def stringList = arrays.get(name, [])
@@ -199,11 +210,12 @@ class Parser {
                             pluralsMap[name] = quantitiesSet
                         }
                         continue
-                    } else if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches())
-                        throw new IOException(name + " is not valid name, row #" + (i + 2))
-                    if (!keys.add(name))
+                    }
+                    if (!keys.add(name)) {
+                        if (mConfig.skipDuplicatedName)
+                            continue
                         throw new IOException(name + " is duplicated in row #" + (i + 2))
-
+                    }
                     string(stringAttrs) {
                         yieldValue(mkp, value)
                     }
@@ -249,19 +261,20 @@ class Parser {
             mkp.yieldUnescaped(value)
     }
 
-    private SourceInfo parseHeader(CSVParser mParser) throws IOException {
-        def headerLine = mParser.getLine()
+    private SourceInfo parseHeader(String[] headerLine) throws IOException {
         if (headerLine == null || headerLine.size() < 2)
             throw new IOException("Invalid CSV header: " + headerLine)
         List<String> header = Arrays.asList(headerLine)
-        def keyIdx = header.indexOf(NAME)
-        if (keyIdx == -1)
+        def keyIdx = header.indexOf(mConfig.nameColumnName)
+        if (keyIdx == -1) {
             throw new IOException("'name' column not present")
-        if (header.indexOf(mConfig.defaultColumnName) == -1)
+        }
+        if (header.indexOf(mConfig.defaultColumnName) == -1) {
             throw new IOException("Default locale column not present")
+        }
         def builders = new XMLBuilder[header.size()]
 
-        def reservedColumns = [NAME, COMMENT, TRANSLATABLE]
+        def reservedColumns = [mConfig.nameColumnName, mConfig.commentColumnName, mConfig.translatableColumnName]
         reservedColumns.addAll(mConfig.ignorableColumns)
         def i = 0
         for (columnName in header) {
@@ -271,8 +284,8 @@ class Parser {
             i++
         }
 
-        def translatableIdx = header.indexOf(TRANSLATABLE)
-        def commentIdx = header.indexOf(COMMENT)
+        def translatableIdx = header.indexOf(mConfig.translatableColumnName)
+        def commentIdx = header.indexOf(mConfig.commentColumnName)
         new SourceInfo(builders, keyIdx, translatableIdx, commentIdx, header.size())
     }
 }
