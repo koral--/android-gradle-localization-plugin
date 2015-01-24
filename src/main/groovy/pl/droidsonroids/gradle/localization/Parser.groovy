@@ -14,7 +14,8 @@ import static pl.droidsonroids.gradle.localization.ResourceType.*
  * Class containing CSV parser logic
  */
 class Parser {
-    private static final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
+    private static
+    final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
     private static final int BUFFER_SIZE = 128 * 1024
     private final CSVParser csvParser
     private final XlsxParser xlsxParser
@@ -25,7 +26,7 @@ class Parser {
     Parser(ConfigExtension config, File resDir) {
         def csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand] as Set
         csvSources.remove(null)
-        if (csvSources.size() != 1){
+        if (csvSources.size() != 1) {
             throw new IllegalArgumentException("Exactly one source must be defined")
         }
         final boolean isCsv //TODO rename
@@ -45,10 +46,10 @@ class Parser {
         mReader = reader
         mResDir = resDir
 
-        if(isCsv){
+        if (isCsv) {
             csvParser = config.csvStrategy ? new CSVParser(reader, config.csvStrategy) : new CSVParser(reader)
-        }else{
-            xlsxParser= new XlsxParser(config.csvFile)
+        } else {
+            xlsxParser = new XlsxParser(config.csvFile)
         }
         mConfig = config
     }

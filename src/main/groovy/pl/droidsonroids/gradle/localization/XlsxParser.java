@@ -28,7 +28,6 @@ public class XlsxParser {
 
     private String[][] getAll(File file) throws IOException {
         Workbook book = new XSSFWorkbook(new FileInputStream(file));
-        //得到Excel第一个sheet
         XSSFSheet se = (XSSFSheet) book.getSheetAt(0);
         String[][] result = new String[se.getLastRowNum()][];
 
@@ -38,7 +37,7 @@ public class XlsxParser {
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 XSSFCell cell = row.getCell(j);
                 //TODO null?
-                result[i][j] = cell==null?"":cell.toString();
+                result[i][j] = cell == null ? "" : cell.toString();
             }
         }
         return result;
