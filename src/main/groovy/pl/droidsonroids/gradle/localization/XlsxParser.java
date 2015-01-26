@@ -1,9 +1,10 @@
 package pl.droidsonroids.gradle.localization;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
@@ -17,25 +18,26 @@ public class XlsxParser {
 
     String all[][];
 
-    public XlsxParser(File file) {
-        try {
-            all = getAll(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public XlsxParser(File file) throws IOException {
+        all = getAll(file);
     }
 
 
     private String[][] getAll(File file) throws IOException {
-        Workbook book = new XSSFWorkbook(new FileInputStream(file));
-        XSSFSheet se = (XSSFSheet) book.getSheetAt(0);
+        FileInputStream inputStream = new FileInputStream(file);
+
+        Workbook book;
+        book = file.getAbsolutePath().endsWith("xls") ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream);
+
+        //得到Excel第一个sheet
+        Sheet se = book.getSheetAt(0);
         String[][] result = new String[se.getLastRowNum()][];
 
         for (int i = 0; i < se.getLastRowNum(); i++) {
-            XSSFRow row = se.getRow(i);
+            Row row = se.getRow(i);
             result[i] = new String[row.getLastCellNum()];
             for (int j = 0; j < row.getLastCellNum(); j++) {
-                XSSFCell cell = row.getCell(j);
+                Cell cell = row.getCell(j);
                 //TODO null?
                 result[i][j] = cell == null ? "" : cell.toString();
             }

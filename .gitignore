@@ -11,5 +11,6 @@ local.properties
 #Gradle
 .gradle
 build
+classes
 
 signing.properties

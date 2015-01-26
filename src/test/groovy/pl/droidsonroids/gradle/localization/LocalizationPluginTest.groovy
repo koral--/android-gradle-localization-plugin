@@ -1,19 +1,21 @@
 package pl.droidsonroids.gradle.localization
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
+
 //TODO add more tests
 class LocalizationPluginTest extends GroovyTestCase {
 
     @Test
     void testCsvFileConfig() {
         def config = new ConfigExtension()
-        config.sourceFile = new File(getClass().getResource('valid.csv').getPath())
-        parseTestCSV(config)
+        config.csvFile = new File(getClass().getResource('valid.csv').getPath())
+        parseTestFile(config)
     }
 
     @Test
@@ -37,12 +39,13 @@ class LocalizationPluginTest extends GroovyTestCase {
     private void parseTestFile(String fileName) {
         def config = new ConfigExtension()
         config.csvFileURI = getClass().getResource(fileName).toURI()
-        parseTestCSV(config)
+        parseTestFile(config)
     }
 
-    private static void parseTestCSV(ConfigExtension config) throws IOException {
+    private static void parseTestFile(ConfigExtension config) throws IOException {
         def project = ProjectBuilder.builder().build()
         def resDir = project.file('src/main/res')
+
         try {
             new Parser(config, resDir).parseCSV()
         }
@@ -53,20 +56,24 @@ class LocalizationPluginTest extends GroovyTestCase {
 
     @Test
     void testXls() {
-        def name = 'language_iOS_append_ALL_340_333_rev.xlsx'
+        def name = 'language_iOS_append_ALL_343_rev.xlsx' //TODO
         def file = new File(getClass().getResource(name).getPath())
         ConfigExtension config = new ConfigExtension()
-        config.csvFile = file
+        config.xlsFile = file
         config.allowEmptyTranslations = true
+        config.skipInvalidName = true
+        config.skipDuplicatedName = true
         config.defaultColumnName = "EN"
         config.nameColumnName = "Android"
         config.ignorableColumns.add("WinPhone")
         config.ignorableColumns.add("iOS")
         config.ignorableColumns.add("END")
-
-        parseTestCSV(config)
+        def resDir = new File("src/test/res")
+        config.outputDirectory = resDir
+        parseTestFile(config)
     }
 
+    //TODO fix or remove
     @Test
     void testWriteXls() {
 
@@ -75,11 +82,11 @@ class LocalizationPluginTest extends GroovyTestCase {
 //        writer(file, map)
         def lanuages = ['', 'cs', 'de', 'es', 'fr', 'hu', 'it', 'ja', 'ko', 'nl', 'pl', 'pt-rBR',
                         'ru', 'sv', 'zh-rCN', 'zh-rTW'] as String[]
-        def sourceDir = new File("/Users/zhangls/AndroidStudioProjects/android/lite/res")
+        def sourceDir = new File(srcDirPath) //TODO provide resources
         def files = filter(sourceDir, lanuages)
         def map = getMap(files);
 
-        def outFile = new File("/Users/zhangls/AndroidStudioProjects/ccc.xlsx")
+        def outFile = new File(outPath) //TODO provide
         writer(outFile, map)
 
     }
@@ -122,8 +129,9 @@ class LocalizationPluginTest extends GroovyTestCase {
 
     private
     static void writer(File file, Map<String, HashMap<String, String>> map) throws IOException {
-        Workbook wb = new XSSFWorkbook();
-        Sheet sheet1 = (Sheet) wb.createSheet("sheet1");
+        Workbook workbook = file.getAbsolutePath().endsWith("xls") ?
+                new HSSFWorkbook() : new XSSFWorkbook();
+        Sheet sheet1 = (Sheet) workbook.createSheet("sheet1");
         int i = 0
         map.each {
             Row row = (Row) sheet1.createRow(i);
@@ -137,7 +145,7 @@ class LocalizationPluginTest extends GroovyTestCase {
         }
 
         OutputStream stream = new FileOutputStream(file);
-        wb.write(stream);
+        workbook.write(stream);
         stream.close();
     }
 

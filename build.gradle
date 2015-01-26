@@ -20,7 +20,8 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile localGroovy()
+    compile 'org.codehaus.groovy:groovy:2.4.0'
+    //compile localGroovy()
     compile 'org.marketcetera.fork:commons-csv:2.4.2'
     compile 'org.apache.poi:poi-ooxml:3.11'
     compile 'org.apache.poi:poi:3.11'
@@ -36,11 +37,11 @@ uploadArchives {
         mavenDeployer {
             beforeDeployment {
                 MavenDeployment deployment -> signing.signPom(deployment)
-            }
+    }
 
             repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
                 authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-            }
+}
             snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
                 authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }

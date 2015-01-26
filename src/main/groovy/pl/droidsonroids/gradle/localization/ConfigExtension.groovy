@@ -22,7 +22,9 @@ class ConfigExtension {
     String nameColumnName = 'name'
     String translatableColumnName = 'translatable'
     String commentColumnName = 'comment'
+    File xlsFile
     File csvFile
+    File outputDirectory
     String csvFileURI
     String csvGenerationCommand
     ArrayList<String> ignorableColumns = []
