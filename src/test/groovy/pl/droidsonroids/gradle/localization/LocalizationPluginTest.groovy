@@ -6,10 +6,11 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Ignore
 import org.junit.Test
 
 //TODO add more tests
-class LocalizationPluginTest extends GroovyTestCase {
+class LocalizationPluginTest {
 
     @Test
     void testCsvFileConfig() {
@@ -73,8 +74,9 @@ class LocalizationPluginTest extends GroovyTestCase {
         parseTestFile(config)
     }
 
-    //TODO fix or remove
     @Test
+    @Ignore
+    //TODO provide data source
     void testWriteXls() {
 
 //        def map = getMap(new File(getClass().getResource('res').getPath()))
@@ -82,11 +84,11 @@ class LocalizationPluginTest extends GroovyTestCase {
 //        writer(file, map)
         def lanuages = ['', 'cs', 'de', 'es', 'fr', 'hu', 'it', 'ja', 'ko', 'nl', 'pl', 'pt-rBR',
                         'ru', 'sv', 'zh-rCN', 'zh-rTW'] as String[]
-        def sourceDir = new File(srcDirPath) //TODO provide resources
+        def sourceDir = new File(srcDirPath)
         def files = filter(sourceDir, lanuages)
         def map = getMap(files);
 
-        def outFile = new File(outPath) //TODO provide
+        def outFile = new File(outPath)
         writer(outFile, map)
 
     }

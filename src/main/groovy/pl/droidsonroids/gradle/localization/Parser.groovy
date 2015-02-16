@@ -21,7 +21,7 @@ class Parser {
     private final mParser
     private final ConfigExtension mConfig
     private final File mResDir
-    private final Reader mReader
+    private final Closeable mCloseableInput
 
     Parser(ConfigExtension config, File resDir) {
         def csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand, config.xlsFile] as Set
@@ -49,14 +49,15 @@ class Parser {
             isCsv = true
         }
 
-        mReader = reader
-        mResDir = resDir
-
         if (isCsv) {
+            mCloseableInput = reader
             mParser = config.csvStrategy ? new CSVParser(reader, config.csvStrategy) : new CSVParser(reader)
         } else {
-            mParser = new XlsxParser(config.xlsFile)
+            mCloseableInput = new BufferedInputStream(new FileInputStream(config.xlsFile), BUFFER_SIZE)
+            mParser = new XlsxParser(mCloseableInput, config.xlsFile.getAbsolutePath().endsWith("xls"))
         }
+
+        mResDir = resDir
         mConfig = config
     }
 
@@ -105,7 +106,7 @@ class Parser {
     }
 
     void parseCSV() throws IOException {
-        mReader.withReader {
+        mCloseableInput.withCloseable {
             def header = parseHeader(mParser.getLine())
             parseCells(header, mParser.getAllValues())
         }
@@ -151,7 +152,7 @@ class Parser {
                     ResourceType resourceType
                     if (indexOfOpeningBrace > 0 && indexOfClosingBrace == name.length() - 1) {
                         indexValue = name.substring(indexOfOpeningBrace + 1, indexOfClosingBrace)
-                        resourceType = indexValue.isEmpty() ? ARRAY : ResourceType.PLURAL
+                        resourceType = indexValue.isEmpty() ? ARRAY : PLURAL
                         name = name.substring(0, indexOfOpeningBrace)
                     } else {
                         resourceType = ResourceType.STRING

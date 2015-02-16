@@ -20,9 +20,9 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.codehaus.groovy:groovy:2.4.0'
-    //compile localGroovy()
+    compile localGroovy()
     compile 'org.marketcetera.fork:commons-csv:2.4.2'
+    compile 'org.apache.poi:ooxml-schemas:1.1'
     compile 'org.apache.poi:poi-ooxml:3.11'
     compile 'org.apache.poi:poi:3.11'
     compile 'org.jsoup:jsoup:1.8.1'
@@ -115,3 +115,11 @@ bintray {
     key = BINTRAY_API_KEY
     pkg.repo = 'maven'
 }
+//task copyTestResources(type: Copy) {
+//    from "${projectDir}/src/test/resources"
+//    into "${buildDir}/classes/test"
+//}
+//processTestResources.dependsOn copyTestResources
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
