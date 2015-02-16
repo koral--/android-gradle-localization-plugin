@@ -29,6 +29,9 @@ class Parser {
         if (csvSources.size() != 1) {
             throw new IllegalArgumentException("Exactly one source must be defined")
         }
+        mResDir = resDir
+        mConfig = config
+
         final boolean isCsv //TODO rename
         Reader reader
         if (config.csvGenerationCommand != null) {
@@ -41,8 +44,6 @@ class Parser {
             reader = new FileReader(config.csvFile)
             isCsv = true
         } else if (config.xlsFile != null) {
-            reader = new FileReader(config.xlsFile)
-            //TODO it is useless, refactor witReader to withCloseable?
             isCsv = false
         } else { // if (config.csvFileURI!=null)
             reader = new InputStreamReader(new URL(config.csvFileURI).openStream())
@@ -57,8 +58,6 @@ class Parser {
             mParser = new XlsxParser(mCloseableInput, config.xlsFile.getAbsolutePath().endsWith("xls"))
         }
 
-        mResDir = resDir
-        mConfig = config
     }
 
     static class SourceInfo {
@@ -105,7 +104,7 @@ class Parser {
         }
     }
 
-    void parseCSV() throws IOException {
+    void parseSpreadsheet() throws IOException {
         mCloseableInput.withCloseable {
             def header = parseHeader(mParser.getLine())
             parseCells(header, mParser.getAllValues())

@@ -48,7 +48,7 @@ class LocalizationPluginTest {
         def resDir = project.file('src/main/res')
 
         try {
-            new Parser(config, resDir).parseCSV()
+            new Parser(config, resDir).parseSpreadsheet()
         }
         finally {
             resDir.deleteDir()
