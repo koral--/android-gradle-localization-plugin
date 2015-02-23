@@ -53,7 +53,7 @@ class ParserEngine {
         }
 
         if (isCsv) {
-            mParser = config.csvStrategy ? new CSVParser(mCloseableInput, config.csvStrategy) : new CSVParser(mCloseableInput)
+            mParser = config.csvStrategy ? new CSVParser((Reader) mCloseableInput, config.csvStrategy) : new CSVParser((Reader) mCloseableInput)
         } else {
             mParser = new XLSXParser(mCloseableInput, config.xlsFile.getAbsolutePath().endsWith("xls"), config.sheetName)
         }
@@ -113,7 +113,6 @@ class ParserEngine {
     }
 
     private parseCells(final SourceInfo sourceInfo, String[][] cells) throws IOException {
-        def attrs = new LinkedHashMap<>(2)
         def stringAttrs = new LinkedHashMap<>(2)
         HashMap<String, Boolean> translatableArrays = new HashMap<String, Boolean>()
         for (j in 1..sourceInfo.mBuilders.length - 1) {
