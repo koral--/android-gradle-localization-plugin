@@ -11,10 +11,7 @@ import java.util.regex.Pattern
 import static pl.droidsonroids.gradle.localization.ResourceType.ARRAY
 import static pl.droidsonroids.gradle.localization.ResourceType.PLURAL
 
-/**
- * Class containing CSV parser logic
- */
-class Parser {
+class ParserEngine {
     private static
     final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
     private static final int BUFFER_SIZE = 128 * 1024
@@ -23,8 +20,9 @@ class Parser {
     private final File mResDir
     private final Closeable mCloseableInput
 
-    Parser(ConfigExtension config, File resDir) {
-        def csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand, config.xlsFile] as Set
+    ParserEngine(ConfigExtension config, File resDir) {
+        def csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand,
+                          config.xlsFile, config.xlsFileURI] as Set
         csvSources.remove(null)
         if (csvSources.size() != 1) {
             throw new IllegalArgumentException("Exactly one source must be defined")
@@ -32,30 +30,32 @@ class Parser {
         mResDir = resDir
         mConfig = config
 
-        final boolean isCsv //TODO rename
-        Reader reader
+        final boolean isCsv
+
         if (config.csvGenerationCommand != null) {
-            def split = config.csvGenerationCommand.split('\\s+')
+            def shellCommand = config.csvGenerationCommand.split('\\s+')
             def redirect = ProcessBuilder.Redirect.INHERIT
-            def process = new ProcessBuilder(split).redirectError(redirect).start()
-            reader = new InputStreamReader(process.getInputStream())
+            def process = new ProcessBuilder(shellCommand).redirectError(redirect).start()
+            mCloseableInput = new InputStreamReader(process.getInputStream())
             isCsv = true
         } else if (config.csvFile != null) {
-            reader = new FileReader(config.csvFile)
+            mCloseableInput = new FileReader(config.csvFile)
             isCsv = true
         } else if (config.xlsFile != null) {
+            mCloseableInput = new BufferedInputStream(new FileInputStream(config.xlsFile), BUFFER_SIZE)
             isCsv = false
-        } else { // if (config.csvFileURI!=null)
-            reader = new InputStreamReader(new URL(config.csvFileURI).openStream())
+        } else if (config.csvFileURI != null) {
+            mCloseableInput = new InputStreamReader(new URL(config.csvFileURI).openStream())
             isCsv = true
+        } else if (config.xlsFileURI != null) {
+            mCloseableInput = new InputStreamReader(new URL(config.xlsFileURI).openStream())
+            isCsv = false
         }
 
         if (isCsv) {
-            mCloseableInput = reader
-            mParser = config.csvStrategy ? new CSVParser(reader, config.csvStrategy) : new CSVParser(reader)
+            mParser = config.csvStrategy ? new CSVParser(mCloseableInput, config.csvStrategy) : new CSVParser(mCloseableInput)
         } else {
-            mCloseableInput = new BufferedInputStream(new FileInputStream(config.xlsFile), BUFFER_SIZE)
-            mParser = new XlsxParser(mCloseableInput, config.xlsFile.getAbsolutePath().endsWith("xls"))
+            mParser = new XLSXParser(mCloseableInput, config.xlsFile.getAbsolutePath().endsWith("xls"), config.sheetName)
         }
 
     }
@@ -106,8 +106,9 @@ class Parser {
 
     void parseSpreadsheet() throws IOException {
         mCloseableInput.withCloseable {
-            def header = parseHeader(mParser.getLine())
-            parseCells(header, mParser.getAllValues())
+            String[][] allCells = mParser.getAllValues()
+            def header = parseHeader(allCells[0])
+            parseCells(header, allCells)
         }
     }
 
@@ -115,7 +116,7 @@ class Parser {
         def attrs = new LinkedHashMap<>(2)
         def stringAttrs = new LinkedHashMap<>(2)
         HashMap<String, Boolean> translatableArrays = new HashMap<String, Boolean>()
-        for (j in 0..sourceInfo.mBuilders.length - 1) {
+        for (j in 1..sourceInfo.mBuilders.length - 1) {
             def builder = sourceInfo.mBuilders[j]
             if (builder == null) {
                 continue

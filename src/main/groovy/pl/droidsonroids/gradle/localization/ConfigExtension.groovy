@@ -22,12 +22,14 @@ class ConfigExtension {
     String nameColumnName = 'name'
     String translatableColumnName = 'translatable'
     String commentColumnName = 'comment'
-    File xlsFile
     File csvFile
-    File outputDirectory
     String csvFileURI
     String csvGenerationCommand
-    ArrayList<String> ignorableColumns = []
+    File xlsFile
+    String xlsFileURI
+    File outputDirectory
+    String sheetName
+    List<String> ignorableColumns = []
     CSVStrategy csvStrategy
     String outputFileName = 'strings.xml'
     String outputIndent = '  '

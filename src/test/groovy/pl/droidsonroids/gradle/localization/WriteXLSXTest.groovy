@@ -5,79 +5,14 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Ignore
 import org.junit.Test
 
-//TODO add more tests
-class LocalizationPluginTest {
-
+@Ignore
+class WriteXLSXTest extends LocalizationPluginTestBase {
     @Test
-    void testCsvFileConfig() {
-        def config = new ConfigExtension()
-        config.csvFile = new File(getClass().getResource('valid.csv').getPath())
-        parseTestFile(config)
-    }
-
-    @Test
-    void testValidFile() {
-        println 'testing valid file'
-        parseTestFile('valid.csv')
-    }
-
-    @Test
-    void testMissingTranslation() {
-        println 'testing invalid file'
-        try {
-            parseTestFile('missing_translation.csv')
-            fail(IOException.class.getName() + ' expected')
-        }
-        catch (IOException ignored) {
-            println 'expected exception thrown'
-        }
-    }
-
-    private void parseTestFile(String fileName) {
-        def config = new ConfigExtension()
-        config.csvFileURI = getClass().getResource(fileName).toURI()
-        parseTestFile(config)
-    }
-
-    private static void parseTestFile(ConfigExtension config) throws IOException {
-        def project = ProjectBuilder.builder().build()
-        def resDir = project.file('src/main/res')
-
-        try {
-            new Parser(config, resDir).parseSpreadsheet()
-        }
-        finally {
-            resDir.deleteDir()
-        }
-    }
-
-    @Test
-    void testXls() {
-        def name = 'language_iOS_append_ALL_343_rev.xlsx' //TODO
-        def file = new File(getClass().getResource(name).getPath())
-        ConfigExtension config = new ConfigExtension()
-        config.xlsFile = file
-        config.allowEmptyTranslations = true
-        config.skipInvalidName = true
-        config.skipDuplicatedName = true
-        config.defaultColumnName = "EN"
-        config.nameColumnName = "Android"
-        config.ignorableColumns.add("WinPhone")
-        config.ignorableColumns.add("iOS")
-        config.ignorableColumns.add("END")
-        def resDir = new File("src/test/res")
-        config.outputDirectory = resDir
-        parseTestFile(config)
-    }
-
-    @Test
-    @Ignore
     //TODO provide data source
-    void testWriteXls() {
+    void testWriteXlsx() {
 
 //        def map = getMap(new File(getClass().getResource('res').getPath()))
 

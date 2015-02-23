@@ -5,7 +5,7 @@ android-gradle-localization-plugin
 Gradle plugin for generating localized string resources
 
 ## Overview
-This plugin generates Android string resource XML files from CSV file.
+This plugin generates Android string resource XML files from CSV or XLS(X) file.
 Generation has to be invoked as additional gradle task.
  
 ##Supported features
@@ -36,7 +36,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
      }
      dependencies {
          classpath 'com.android.tools.build:gradle:0.14.+'
-         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.7'
+         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.8'
      }
  }
  ```
@@ -55,9 +55,15 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
          csvFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=csv'
          OR
          csvGenerationCommand='/usr/bin/xlsx2csv translation.xlsx'
+         OR
+         xlsFile=file('translations.xlsx')
+         OR
+         xlsFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=xlsx'
      }
  ```
- `csvFileURI` can be any valid URI, not necessarily Google Docs' one 
+ * `csvFileURI` and `xlsFileURI` can be any valid URI, not necessarily Google Docs' one
+ * `xlsFile` and `xlsFileURI` accepts both XLSX and XLS files. If filename ends with `xls` file will
+    be treated as XLS, XLSX otherwise
 
 ## Usage 
 Invoke `localization` gradle task. Task may be invoked from commandline or from Android Studio GUI.
@@ -92,24 +98,23 @@ will produce 2 XML files:
 
 ##Configuration
 `localization` extension in `build.gradle` can contain several configuration options. All of them 
-except CSV source are optional and has reasonable default values.<br>
-CSV source. __Exactly one of them__ must be specified:
-* `csvFile` - CSV File, Gradle's `file()` can be used to retrieve files by path relative to module location or absolute   
-* `csvFileURI` - CSV file URI
+except source are optional and has reasonable default values.<br>
+Sources,  __exactly one of them__ must be specified:
+* `csvFile`, `xlsFile` - CSV/XLS(X) file, Gradle's `file()` can be used to retrieve files by path relative to module location or absolute
+* `csvFileURI`, `xlsFileURI` - CSV/XLS(X) file URI
 * `csvGenerationCommand` - shell command which writes CSV as text to standard output.
 Command string should be specified like for [Runtime#exec()](http://docs.oracle.com/javase/8/docs/api/java/lang/Runtime.html#exec-java.lang.String-).
 Standard error of the command is redirected to the standard error of the process executing gradle,
 so it could be seen in the gradle console.
 
-#### CSV format:
-* `defaultColumnName` - default=`'default'`, column name which corresponds to default localization
+#### Spreadsheet format:
+* `defaultColumnName` - default=`'default'`, name of the column which corresponds to default localization
 (`values` folder)
-* `csvStrategy` - default=`null` (library default strategy, equivalent of 
-[CSVStrategy.DEFAULT_STRATEGY](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html#DEFAULT_STRATEGY))
- - see [CSVStrategy javadoc](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html),
- and [sources](http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-core/4.8.0/org/apache/solr/internal/csv/CSVStrategy.java#CSVStrategy)
- since documentation is quite incomplete
-
+* `nameColumnName` - default=`'name'`, name of the column containing key names (source for the `name`
+XML attribute)
+* `translatableColumnName` - default=`'translatable'`, name of the column containing translatable flags
+(source for the `translatable` XML attribute)
+* `commentColumnName` - default=`'comment'`, name of the column containing comments
 The following options turn off some character escaping and substitutions, can be useful if you have 
 something already escaped in CSV:
 * `escapeApostrophes` - default=`true`, if set to false apostrophes (`'`) won't be escaped
@@ -128,6 +133,16 @@ possible values:
    &lt;b&gt;bold&lt;/b&gt;} will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
    See [JSoup](http://jsoup.org) - library used to detect tags
 
+#### CSV format:
+* `csvStrategy` - default=`null` (library default strategy, equivalent of
+[CSVStrategy.DEFAULT_STRATEGY](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html#DEFAULT_STRATEGY))
+ - see [CSVStrategy javadoc](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html),
+ and [sources](http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-core/4.8.0/org/apache/solr/internal/csv/CSVStrategy.java#CSVStrategy)
+ since documentation is quite incomplete
+
+#### XLS(X) format:
+* `sheetName` - default=`<name of the first sheet>`, name of the sheet to be parsed, only one can be specified
+
 #### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
 contain column names eg. `['Section', 'Notes']`
@@ -136,6 +151,10 @@ non-translatable but translated are permitted
 * `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted
 * `outputFileName` - default=`strings.xml`, XML file name (with extension) which should be generated as an output
 * `outputIndent` - default=`  `(two spaces), character(s) used to indent each line in output XML files
+* `skipInvalidName` - default=`false`, if set to true then rows with invalid key names will be ignored instead
+of throwing an exception
+* `skipDuplicatedName` - default=`false`, if set to true then rows with duplicated key names will be ignored instead
+of throwing an exception. First rows with given key will be taken into account.
 
 #### Migration from previous versions:
 Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to true. Currently strings are always escaped when corresponding *parsed* CSV ceil contains leading or trailing spaces, but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default. If you want to include mentioned spaces in output set appropriate `csvStrategy`.

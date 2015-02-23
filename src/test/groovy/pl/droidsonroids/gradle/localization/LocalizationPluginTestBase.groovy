@@ -1,0 +1,25 @@
+package pl.droidsonroids.gradle.localization
+
+import org.gradle.testfixtures.ProjectBuilder
+
+abstract class LocalizationPluginTestBase {
+
+    void parseTestFile(String fileName) {
+        def config = new ConfigExtension()
+        config.csvFileURI = getClass().getResource(fileName).toURI()
+        parseTestFile(config)
+    }
+
+    static void parseTestFile(ConfigExtension config) throws IOException {
+        def project = ProjectBuilder.builder().build()
+        def resDir = project.file('src/main/res')
+
+        try {
+            new ParserEngine(config, resDir).parseSpreadsheet()
+        }
+        finally {
+            resDir.deleteDir()
+        }
+    }
+
+}
