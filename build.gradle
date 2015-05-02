@@ -12,6 +12,7 @@ plugins {
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'jacoco'
 
 repositories {
     mavenCentral()
@@ -25,7 +26,7 @@ dependencies {
     compile 'org.apache.poi:ooxml-schemas:1.1'
     compile 'org.apache.poi:poi-ooxml:3.11'
     compile 'org.apache.poi:poi:3.11'
-    compile 'org.jsoup:jsoup:1.8.1'
+    compile 'org.jsoup:jsoup:1.8.2'
     testCompile 'junit:junit:4.12'
 }
 
@@ -115,11 +116,16 @@ bintray {
     key = BINTRAY_API_KEY
     pkg.repo = 'maven'
 }
-//task copyTestResources(type: Copy) {
-//    from "${projectDir}/src/test/resources"
-//    into "${buildDir}/classes/test"
-//}
-//processTestResources.dependsOn copyTestResources
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+jacoco {
+    toolVersion = '0.7.4.201502262128'
+}
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+    }
+}

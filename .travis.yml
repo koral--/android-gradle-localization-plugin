@@ -1,6 +1,6 @@
 language:
-  - java
+  - groovy
 jdk:
   - oraclejdk8
 script:
-  - ./gradlew check --info
+  - ./gradlew build --info

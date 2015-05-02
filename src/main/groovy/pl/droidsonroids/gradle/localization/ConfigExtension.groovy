@@ -21,6 +21,7 @@ class ConfigExtension {
     String defaultColumnName = 'default'
     String nameColumnName = 'name'
     String translatableColumnName = 'translatable'
+    String formattedColumnName = 'formatted'
     String commentColumnName = 'comment'
     File csvFile
     String csvFileURI
@@ -35,4 +36,5 @@ class ConfigExtension {
     String outputIndent = '  '
     boolean skipInvalidName
     boolean skipDuplicatedName
+    String defaultLocaleQualifier
 }

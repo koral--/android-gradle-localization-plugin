@@ -1,8 +1,10 @@
-name        ,default    ,pl         ,comment    ,translatable
+name        ,default    ,pl         ,comment    ,translatable,formatted
 app         ,Application, ,,false
 cow[one]  ,cow      ,krowa
 file        ,File       ,"Plik"     ,file label ,
-cow[other],cows     ,krowy,comment
 days[],monday,,,false
+cow[other],cows     ,krowy,comment
 days[],tuesday,,,
 days[],wednesday,,,
+
+percent,%d %s,,,false,false

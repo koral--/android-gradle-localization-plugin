@@ -6,7 +6,7 @@ class ParseXLSXTest extends LocalizationPluginTestBase {
 
     @Test
     void testXlsx() {
-        def name = 'language_iOS_append_ALL_343_rev.xlsx'
+        def name = 'valid.xlsx'
         def file = new File(getClass().getResource(name).getPath())
         ConfigExtension config = new ConfigExtension()
         config.xlsFile = file
@@ -18,6 +18,7 @@ class ParseXLSXTest extends LocalizationPluginTestBase {
         config.ignorableColumns.add("WinPhone")
         config.ignorableColumns.add("iOS")
         config.ignorableColumns.add("END")
+        config.defaultLocaleQualifier = "en"
         parseTestFile(config)
     }
 }

@@ -25,4 +25,12 @@ class PluralItem {
     int hashCode() {
         return quantity.hashCode()
     }
+
+    @Override
+    public String toString() {
+        return "PluralItem{" +
+                "value='" + value + '\'' +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

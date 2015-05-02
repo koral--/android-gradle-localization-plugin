@@ -64,14 +64,16 @@ class ParserEngine {
         private final XMLBuilder[] mBuilders
         private final int mCommentIdx
         private final int mTranslatableIdx
+        private final int mFormattedIdx
         private final int mNameIdx
         private final int mColumnsCount
 
-        SourceInfo(XMLBuilder[] builders, nameIdx, translatableIdx, commentIdx, columnsCount) {
+        SourceInfo(XMLBuilder[] builders, nameIdx, translatableIdx, commentIdx, formattedIdx, columnsCount) {
             mBuilders = builders
             mNameIdx = nameIdx
             mTranslatableIdx = translatableIdx
             mCommentIdx = commentIdx
+            mFormattedIdx = formattedIdx
             mColumnsCount = columnsCount
         }
     }
@@ -99,8 +101,11 @@ class ParserEngine {
             mBuilder.getMkp().xmlDeclaration(version: '1.0', encoding: 'UTF-8')
         }
 
-        def addResource(body) {//TODO add support for tools:locale
-            mBuilder.resources(body/*, 'xmlns:tools':'http://schemas.android.com/tools', 'tools:locale':mQualifier*/)
+        def addResource(body) {
+            if (mQualifier == mConfig.defaultColumnName && mConfig.defaultLocaleQualifier != null)
+                mBuilder.resources(body, 'xmlns:tools': 'http://schemas.android.com/tools', 'tools:locale': mConfig.defaultLocaleQualifier)
+            else
+                mBuilder.resources(body)
         }
     }
 
@@ -113,7 +118,6 @@ class ParserEngine {
     }
 
     private parseCells(final SourceInfo sourceInfo, String[][] cells) throws IOException {
-        def stringAttrs = new LinkedHashMap<>(2)
         HashMap<String, Boolean> translatableArrays = new HashMap<String, Boolean>()
         for (j in 1..sourceInfo.mBuilders.length - 1) {
             def builder = sourceInfo.mBuilders[j]
@@ -123,6 +127,7 @@ class ParserEngine {
             //the key indicate all language string
             def keys = new HashSet(cells.length)
             builder.addResource({
+                def stringAttrs = new LinkedHashMap<>(2)
                 def pluralsMap = new HashMap<String, HashSet<PluralItem>>()
                 def arrays = new HashMap<String, List<StringArrayItem>>()
                 for (i in 0..cells.length - 1) {
@@ -133,7 +138,7 @@ class ParserEngine {
                     if (row.length < sourceInfo.mColumnsCount) {
                         String[] extendedRow = new String[sourceInfo.mColumnsCount]
                         System.arraycopy(row, 0, extendedRow, 0, row.length)
-                        for (k in row.length..sourceInfo.mColumnsCount - 1)
+                        for (int k in row.length..sourceInfo.mColumnsCount - 1)
                             extendedRow[k] = ''
                         row = extendedRow
                     }
@@ -159,25 +164,27 @@ class ParserEngine {
                     }
 
                     def translatable = true
-                    if (resourceType == ResourceType.STRING || resourceType == ARRAY) {
-                        stringAttrs['name'] = name //TODO not used by array, optimize?
-                        if (sourceInfo.mTranslatableIdx >= 0) {
-                            translatable = !row[sourceInfo.mTranslatableIdx].equalsIgnoreCase('false')
-                            if (resourceType == ARRAY) {
-                                translatable &= translatableArrays.get(name, true)
-                                translatableArrays[name] = translatable
-                            } else
-                                stringAttrs['translatable'] = translatable ? null : 'false'
-                        }
-                        if (value.isEmpty()) {
-                            if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
-                                continue
-                            if (!mConfig.allowEmptyTranslations)
-                                throw new IOException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 2))
-                        } else {
-                            if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
-                                throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 2))
-                        }
+                    stringAttrs['name'] = name
+                    if (sourceInfo.mTranslatableIdx >= 0) {
+                        translatable = !row[sourceInfo.mTranslatableIdx].equalsIgnoreCase('false')
+                        if (resourceType == ARRAY) {
+                            translatable &= translatableArrays.get(name, true)
+                            translatableArrays[name] = translatable
+                        } else
+                            stringAttrs['translatable'] = translatable ? null : 'false'
+                    }
+                    if (sourceInfo.mFormattedIdx >= 0) {
+                        def formatted = !row[sourceInfo.mFormattedIdx].equalsIgnoreCase('false')
+                        stringAttrs['formatted'] = formatted ? null : 'false'
+                    }
+                    if (value.isEmpty()) {
+                        if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
+                            continue
+                        if (!mConfig.allowEmptyTranslations)
+                            throw new IOException(name + " is not translated to locale " + builder.mQualifier + ", row #" + (i + 1))
+                    } else {
+                        if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
+                            throw new IOException(name + " is translated but marked translatable='false', row #" + (i + 1))
                     }
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")
@@ -198,7 +205,7 @@ class ParserEngine {
                     if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
                         if (mConfig.skipInvalidName)
                             continue
-                        throw new IOException(name + " is not valid name, row #" + (i + 2))
+                        throw new IOException(name + " is not valid name, row #" + (i + 1))
                     }
                     if (resourceType == PLURAL || resourceType == ARRAY) {
                         //TODO require only one translatable value for all list?
@@ -208,12 +215,12 @@ class ParserEngine {
                             arrays[name] = stringList
                         } else {
                             Quantity pluralQuantity = Quantity.valueOf(indexValue)
-                            //                        if (!Quantity.values().contains(pluralQuantity))
-                            //                            throw new IOException(pluralQuantity + " is not valid quantity, row #" + (i + 2))
+                            if (!Quantity.values().contains(pluralQuantity))
+                                throw new IOException(pluralQuantity.name() + " is not valid quantity, row #" + (i + 1))
                             HashSet<PluralItem> quantitiesSet = pluralsMap.get(name, [] as HashSet)
                             if (!value.isEmpty()) {
                                 if (!quantitiesSet.add(new PluralItem(pluralQuantity, value, comment)))
-                                    throw new IOException(name + " is duplicated in row #" + (i + 2))
+                                    throw new IOException(name + " is duplicated in row #" + (i + 1))
                             }
                         }
                         continue
@@ -221,7 +228,7 @@ class ParserEngine {
                     if (!keys.add(name)) {
                         if (mConfig.skipDuplicatedName)
                             continue
-                        throw new IOException(name + " is duplicated in row #" + (i + 2))
+                        throw new IOException(name + " is duplicated in row #" + (i + 1))
                     }
                     string(stringAttrs) {
                         yieldValue(mkp, value)
@@ -229,29 +236,29 @@ class ParserEngine {
                     if (comment) {
                         mkp.comment(comment)
                     }
-                    for (Map.Entry<String, HashSet<PluralItem>> entry : pluralsMap) {
-                        plurals([name: entry.key]) {
-                            if (entry.value.isEmpty())
-                                throw new IOException("At least one quantity string must be defined for key: "
-                                        + entry.key + ", qualifier " + builder.mQualifier)
-                            for (PluralItem quantityEntry : entry.value) {
-                                item(quantity: quantityEntry.quantity) {
-                                    yieldValue(mkp, quantityEntry.value)
-                                }
-                                if (quantityEntry.comment)
-                                    mkp.comment(quantityEntry.comment)
+                }
+                for (Map.Entry<String, HashSet<PluralItem>> entry : pluralsMap) {
+                    plurals([name: entry.key]) {
+                        if (entry.value.isEmpty())
+                            throw new IOException("At least one quantity string must be defined for key: "
+                                    + entry.key + ", qualifier " + builder.mQualifier)
+                        for (PluralItem quantityEntry : entry.value) {
+                            item(quantity: quantityEntry.quantity) {
+                                yieldValue(mkp, quantityEntry.value)
                             }
+                            if (quantityEntry.comment)
+                                mkp.comment(quantityEntry.comment)
                         }
                     }
-                    for (Map.Entry<String, List<StringArrayItem>> entry : arrays) {
-                        'string-array'([name: entry.key, translatable: translatableArrays[entry.key] ? null : 'false']) {
-                            for (StringArrayItem stringArrayItem : entry.value) {
-                                item {
-                                    yieldValue(mkp, stringArrayItem.value)
-                                }
-                                if (stringArrayItem.comment)
-                                    mkp.comment(stringArrayItem.comment)
+                }
+                for (Map.Entry<String, List<StringArrayItem>> entry : arrays) {
+                    'string-array'([name: entry.key, translatable: translatableArrays[entry.key] ? null : 'false']) {
+                        for (StringArrayItem stringArrayItem : entry.value) {
+                            item {
+                                yieldValue(mkp, stringArrayItem.value)
                             }
+                            if (stringArrayItem.comment)
+                                mkp.comment(stringArrayItem.comment)
                         }
                     }
                 }
@@ -281,7 +288,7 @@ class ParserEngine {
         }
         def builders = new XMLBuilder[header.size()]
 
-        def reservedColumns = [mConfig.nameColumnName, mConfig.commentColumnName, mConfig.translatableColumnName]
+        def reservedColumns = [mConfig.nameColumnName, mConfig.commentColumnName, mConfig.translatableColumnName, mConfig.formattedColumnName]
         reservedColumns.addAll(mConfig.ignorableColumns)
         def i = 0
         for (columnName in header) {
@@ -293,6 +300,7 @@ class ParserEngine {
 
         def translatableIdx = header.indexOf(mConfig.translatableColumnName)
         def commentIdx = header.indexOf(mConfig.commentColumnName)
-        new SourceInfo(builders, keyIdx, translatableIdx, commentIdx, header.size())
+        def formattedIdx = header.indexOf(mConfig.formattedColumnName)
+        new SourceInfo(builders, keyIdx, translatableIdx, commentIdx, formattedIdx, header.size())
     }
 }
