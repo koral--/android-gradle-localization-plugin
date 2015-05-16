@@ -7,6 +7,7 @@ buildscript {
 
 plugins {
     id 'nu.studer.plugindev' version '1.0.3'
+    id 'com.gradle.plugin-publish' version '0.9.0'
 }
 
 apply plugin: 'groovy'
@@ -115,6 +116,20 @@ bintray {
     user = POM_DEVELOPER_ID
     key = BINTRAY_API_KEY
     pkg.repo = 'maven'
+}
+
+pluginBundle {
+    website = POM_URL
+    vcsUrl = POM_SCM_URL
+    description = POM_DESCRIPTION
+    tags = ['localization', 'android']
+
+    plugins {
+        greetingsPlugin {
+            id = 'pl.droidsonroids.localization'
+            displayName = 'Gradle plugin for generating localized Android resources'
+        }
+    }
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8

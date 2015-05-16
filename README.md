@@ -9,11 +9,13 @@ This plugin generates Android string resource XML files from CSV or XLS(X) file.
 Generation has to be invoked as additional gradle task.
  
 ##Supported features
- * non-translatable resources - `translatable="false"` XML attribute
+ * non-translatable resources - `translatable` XML attribute
  * auto-escaping double quotes, apostrophes and newlines
  * auto-quoting leading and trailing spaces
  * syntax validation - duplicated, empty, invalid names detection
  * comments
+ * formatted strings - `formatted` XML attribute
+ * default locale specification - `tools:locale`
   
 ## Applying plugin
 ### Gradle 2.1+
@@ -46,7 +48,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
  apply plugin: 'pl.droidsonroids.localization'
  ```
  
- ## Configuration
+## Configuration
  ```
  localization
      {
@@ -115,6 +117,8 @@ XML attribute)
 * `translatableColumnName` - default=`'translatable'`, name of the column containing translatable flags
 (source for the `translatable` XML attribute)
 * `commentColumnName` - default=`'comment'`, name of the column containing comments
+* `formattedColumnName` - default=`'formatted'`, name of the column formatted flags
+                                                                    (source for the `formatted` XML attribute)
 The following options turn off some character escaping and substitutions, can be useful if you have 
 something already escaped in CSV:
 * `escapeApostrophes` - default=`true`, if set to false apostrophes (`'`) won't be escaped
@@ -155,9 +159,16 @@ non-translatable but translated are permitted
 of throwing an exception
 * `skipDuplicatedName` - default=`false`, if set to true then rows with duplicated key names will be ignored instead
 of throwing an exception. First rows with given key will be taken into account.
+* `defaultLocaleQualifier` - language (eg. `es`) and optionally region (eg. `es_US`) ISO codes of default translations.
+ Default=`null`(unset) which effectively means English `en`, if set then value will be placed in `tools:locale`
+ XML attribute. See [Tools Attributes](http://tools.android.com/tech-docs/tools-attributes#TOC-tools:locale)
+ for more information.
 
-#### Migration from previous versions:
-Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to true. Currently strings are always escaped when corresponding *parsed* CSV ceil contains leading or trailing spaces, but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default. If you want to include mentioned spaces in output set appropriate `csvStrategy`.
+#### Migration from versions <1.0.7:
+Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to true. Currently
+strings are always escaped when corresponding **parsed**  ceil contains leading or trailing spaces,
+but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default.
+If you want to include mentioned spaces in output set appropriate `csvStrategy`.
 
 ##License
 
