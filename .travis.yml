@@ -3,4 +3,4 @@ language:
 jdk:
   - oraclejdk8
 script:
-  - ./gradlew build --info
+  - gradle build --info --stacktrace
