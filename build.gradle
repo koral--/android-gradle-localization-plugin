@@ -24,8 +24,8 @@ dependencies {
     compile localGroovy()
     compile 'org.marketcetera.fork:commons-csv:2.4.2'
     compile 'org.apache.poi:ooxml-schemas:1.1'
-    compile 'org.apache.poi:poi-ooxml:3.11'
-    compile 'org.apache.poi:poi:3.11'
+    compile 'org.apache.poi:poi-ooxml:3.12'
+    compile 'org.apache.poi:poi:3.12'
     compile 'org.jsoup:jsoup:1.8.2'
     testCompile 'junit:junit:4.12'
 }
@@ -123,9 +123,14 @@ targetCompatibility = JavaVersion.VERSION_1_8
 jacoco {
     toolVersion = '0.7.4.201502262128'
 }
+
 jacocoTestReport {
     reports {
         xml.enabled false
         csv.enabled false
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
 }
