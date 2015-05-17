@@ -96,10 +96,23 @@ signing {
     sign configurations.archives
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocsJar
+}
+
 bintray {
     user = POM_DEVELOPER_ID
     key = BINTRAY_API_KEY
-    pkg.repo = 'maven'
+    pkg {
+        repo = 'maven'
+        name = POM_ARTIFACT_ID
+    }
 }
 
 pluginBundle {
@@ -109,9 +122,10 @@ pluginBundle {
     tags = ['localization', 'android']
 
     plugins {
-        greetingsPlugin {
+        localizationPlugin {
             id = 'pl.droidsonroids.localization'
-            displayName = 'Gradle plugin for generating localized Android resources'
+            displayName = 'Android gradle localization plugin'
+            description = 'Gradle plugin for generating localized Android resources'
         }
     }
 }
