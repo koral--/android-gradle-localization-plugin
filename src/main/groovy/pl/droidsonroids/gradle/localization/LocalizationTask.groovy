@@ -10,6 +10,7 @@ class LocalizationTask extends DefaultTask {
     }
     @TaskAction
     def parseFile() {
-        new ParserEngine(project.localization, project.localization.outputDirectory ?: project.file('src/main/res')).parseSpreadsheet()
+        def resDir = project.localization.outputDirectory ?: project.file('src/main/res')
+        new ParserEngine(project.localization, resDir).parseSpreadsheet()
     }
 }
