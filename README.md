@@ -9,6 +9,8 @@ This plugin generates Android string resource XML files from CSV or XLS(X) file.
 Generation has to be invoked as additional gradle task.
  
 ##Supported features
+ * string arrays
+ * plurals
  * non-translatable resources - `translatable` XML attribute
  * auto-escaping double quotes, apostrophes and newlines
  * auto-quoting leading and trailing spaces
@@ -119,6 +121,7 @@ XML attribute)
 * `commentColumnName` - default=`'comment'`, name of the column containing comments
 * `formattedColumnName` - default=`'formatted'`, name of the column formatted flags
                                                                     (source for the `formatted` XML attribute)
+
 The following options turn off some character escaping and substitutions, can be useful if you have 
 something already escaped in CSV:
 * `escapeApostrophes` - default=`true`, if set to false apostrophes (`'`) won't be escaped
@@ -126,8 +129,7 @@ something already escaped in CSV:
 * `escapeNewLines` - default=`true`, if set to false newline characters won't be escaped
 * `convertTripleDotsToHorizontalEllipsis` - default=`true`, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
 * `escapeSlashes` - default=`true`, if set to false slashes (`\`) won't be escaped
-* `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
-if set to `null` Unicode normalization won't be performed, see (javadoc of Normalizer)[http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC]
+* `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC) if set to `null` Unicode normalization won't be performed, see [javadoc of Normalizer](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
 for more details
 * `tagEscapingStrategy` - default=`IF_TAGS_ABSENT`, defines X(H)TML tag brackets (&lt; and &gt;) escaping strategy
 possible values:
