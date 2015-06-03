@@ -22,7 +22,7 @@ Generation has to be invoked as additional gradle task.
 In whichever `build.gradle` file.
 ```
 plugins {
-  id 'pl.droidsonroids.localization' version '1.0.7'
+  id 'pl.droidsonroids.localization' version '1.0.8'
 }
 ```
 Note: exact version number must be specified, `+` cannot be used as wildcard.
