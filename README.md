@@ -6,7 +6,7 @@ Gradle plugin for generating localized string resources
 
 ## Overview
 This plugin generates Android string resource XML files from CSV or XLS(X) file.
-Generation has to be invoked as additional gradle task.
+Generation has to be invoked as additional gradle task. Java 1.8 is required.
  
 ##Supported features
  * string arrays
@@ -39,7 +39,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
          jcenter()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:0.14.+'
+         classpath 'com.android.tools.build:gradle:1.2.3'
          classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.8'
      }
  }
@@ -50,26 +50,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
  apply plugin: 'pl.droidsonroids.localization'
  ```
  
-## Configuration
- ```
- localization
-     {
-         csvFile=file('translations.csv')
-         OR
-         csvFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=csv'
-         OR
-         csvGenerationCommand='/usr/bin/xlsx2csv translation.xlsx'
-         OR
-         xlsFile=file('translations.xlsx')
-         OR
-         xlsFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=xlsx'
-     }
- ```
- * `csvFileURI` and `xlsFileURI` can be any valid URI, not necessarily Google Docs' one
- * `xlsFile` and `xlsFileURI` accepts both XLSX and XLS files. If filename ends with `xls` file will
-    be treated as XLS, XLSX otherwise
-
-## Usage 
+## Usage
 Invoke `localization` gradle task. Task may be invoked from commandline or from Android Studio GUI.
  * from commandline: `./gradlew localization` (or `gradlew.bat localization` on Windows)
  * from GUI: menu `View->Tool Windows->Gradle` and double click `localization`<br>
@@ -101,8 +82,25 @@ will produce 2 XML files:
 ```
 
 ##Configuration
-`localization` extension in `build.gradle` can contain several configuration options. All of them 
-except source are optional and has reasonable default values.<br>
+Add `localization` extension in `build.gradle` of particular module.
+ ```
+ localization
+     {
+         csvFile=file('translations.csv')
+         OR
+         csvFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=csv'
+         OR
+         csvGenerationCommand='/usr/bin/xlsx2csv translation.xlsx'
+         OR
+         xlsFile=file('translations.xlsx')
+         OR
+         xlsFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=xlsx'
+     }
+ ```
+* `csvFileURI` and `xlsFileURI` can be any valid URI, not necessarily Google Docs' one
+* `xlsFile` and `xlsFileURI` accepts both XLSX and XLS files. If filename ends with `xls` file will
+    be treated as XLS, XLSX otherwise
+
 Sources,  __exactly one of them__ must be specified:
 * `csvFile`, `xlsFile` - CSV/XLS(X) file, Gradle's `file()` can be used to retrieve files by path relative to module location or absolute
 * `csvFileURI`, `xlsFileURI` - CSV/XLS(X) file URI

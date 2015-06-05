@@ -20,6 +20,10 @@ class ParserEngine {
     private final File mResDir
     private final Closeable mCloseableInput
 
+    enum SourceType {
+        CSV, XLS, XLSX
+    }
+
     ParserEngine(ConfigExtension config, File resDir) {
         def csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand,
                           config.xlsFile, config.xlsFileURI] as Set
@@ -30,34 +34,44 @@ class ParserEngine {
         mResDir = resDir
         mConfig = config
 
-        final boolean isCsv
+        final SourceType sourceType
 
         if (config.csvGenerationCommand != null) {
             def shellCommand = config.csvGenerationCommand.split('\\s+')
             def redirect = ProcessBuilder.Redirect.INHERIT
             def process = new ProcessBuilder(shellCommand).redirectError(redirect).start()
-            mCloseableInput = new InputStreamReader(process.getInputStream())
-            isCsv = true
+            mCloseableInput = wrapReader(new InputStreamReader(process.getInputStream()))
+            sourceType = SourceType.CSV
         } else if (config.csvFile != null) {
-            mCloseableInput = new FileReader(config.csvFile)
-            isCsv = true
-        } else if (config.xlsFile != null) {
-            mCloseableInput = new BufferedInputStream(new FileInputStream(config.xlsFile), BUFFER_SIZE)
-            isCsv = false
+            mCloseableInput = wrapReader(new FileReader(config.csvFile))
+            sourceType = SourceType.CSV
         } else if (config.csvFileURI != null) {
-            mCloseableInput = new InputStreamReader(new URL(config.csvFileURI).openStream())
-            isCsv = true
+            mCloseableInput = wrapReader(new InputStreamReader(new URL(config.csvFileURI).openStream()))
+            sourceType = SourceType.CSV
         } else if (config.xlsFileURI != null) {
-            mCloseableInput = new InputStreamReader(new URL(config.xlsFileURI).openStream())
-            isCsv = false
+            final url = new URL(config.xlsFileURI)
+            mCloseableInput = wrapInputStream(url.openStream())
+            sourceType = url.getPath().endsWith("xls") ? SourceType.XLS : SourceType.XLSX
+        } else if (config.xlsFile != null) {
+            mCloseableInput = wrapInputStream(new FileInputStream(config.xlsFile))
+            sourceType = config.xlsFile.getAbsolutePath().endsWith("xls") ? SourceType.XLS : SourceType.XLSX
+        } else {
+            throw new IllegalStateException()
         }
 
-        if (isCsv) {
+        if (sourceType == SourceType.CSV) {
             mParser = config.csvStrategy ? new CSVParser((Reader) mCloseableInput, config.csvStrategy) : new CSVParser((Reader) mCloseableInput)
         } else {
-            mParser = new XLSXParser(mCloseableInput, config.xlsFile.getAbsolutePath().endsWith("xls"), config.sheetName)
+            mParser = new XLSXParser((InputStream) mCloseableInput, sourceType == SourceType.XLS, config.sheetName)
         }
+    }
 
+    private static BufferedReader wrapReader(Reader reader) {
+        new BufferedReader(reader, BUFFER_SIZE)
+    }
+
+    private static BufferedInputStream wrapInputStream(InputStream inputStream) {
+        new BufferedInputStream(inputStream, BUFFER_SIZE)
     }
 
     static class SourceInfo {

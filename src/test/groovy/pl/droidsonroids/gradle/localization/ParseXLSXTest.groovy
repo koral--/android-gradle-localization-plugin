@@ -5,11 +5,23 @@ import org.junit.Test
 class ParseXLSXTest extends LocalizationPluginTestBase {
 
     @Test
-    void testXlsx() {
+    void testXlsxFile() {
         def name = 'valid.xlsx'
         def file = new File(getClass().getResource(name).getPath())
         ConfigExtension config = new ConfigExtension()
         config.xlsFile = file
+        testXlsx(config)
+    }
+
+    @Test
+    void testXlsxURI() {
+        def name = 'valid.xlsx'
+        ConfigExtension config = new ConfigExtension()
+        config.xlsFileURI = getClass().getResource(name)
+        testXlsx(config)
+    }
+
+    static void testXlsx(ConfigExtension config) {
         config.allowEmptyTranslations = true
         config.skipInvalidName = true
         config.skipDuplicatedName = true

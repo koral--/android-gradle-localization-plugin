@@ -5,8 +5,8 @@ import org.gradle.api.tasks.TaskAction
 
 class LocalizationTask extends DefaultTask {
     {
-        description = "Generates XML" //TODO
-        group = "android"
+        description = "Generates XML"
+        group = 'android'
     }
     @TaskAction
     def parseFile() {
