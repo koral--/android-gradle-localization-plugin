@@ -133,8 +133,19 @@ class ParserEngine {
         mCloseableInput.withCloseable {
             String[][] allCells = mParser.getAllValues()
             def header = parseHeader(allCells[0])
-            parseCells(header, allCells)
+            parseCells(header, getContent(allCells))
         }
+    }
+
+    private String[][] getContent(String[][] all){
+        String[][] result = new String[all.length - 1][];
+        for (int i = 1; i < all.length; i++) {
+            result[i - 1] = new String[all[i].length];
+            for (int j = 0; j < all[i].length; j++) {
+                result[i - 1][j] =  all[i][j];
+            }
+        }
+        return result;
     }
 
     private parseCells(final SourceInfo sourceInfo, String[][] cells) throws IOException {
@@ -164,6 +175,10 @@ class ParserEngine {
                     }
 
                     String name = row[sourceInfo.mNameIdx]
+                    if(mConfig.ignorableNames != null && mConfig.ignorableNames.contains(name)){
+                        continue
+                    }
+
                     def value = row[j]
 
                     String comment = null
@@ -214,11 +229,11 @@ class ParserEngine {
                         value = value.replace("\"", "\\\"")
                     if (mConfig.escapeNewLines)
                         value = value.replace("\n", "\\n")
-                    if (value.startsWith(' ') || value.endsWith(' '))
-                        value = '"' + value + '"'
+//                    if (value.startsWith(' ') || value.endsWith(' '))
+//                        value = '"' + value + '"'
                     if (mConfig.convertTripleDotsToHorizontalEllipsis)
                         value = value.replace("...", "…")
-                    value = value.replace("?", "\\?")
+//                    value = value.replace("?", "\\?")
                     if (mConfig.normalizationForm)
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
 
