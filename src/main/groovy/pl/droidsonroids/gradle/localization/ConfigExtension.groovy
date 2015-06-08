@@ -47,4 +47,12 @@ class ConfigExtension {
     String outputFileName = 'strings.xml'
     String outputIndent = '  '
     File outputDirectory
+
+    //Xml update
+    File inputDirectory
+    File report
+    Map<String, String> map
+    boolean append
+    boolean replace
+
 }

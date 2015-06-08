@@ -13,5 +13,12 @@ class LocalizationTask extends DefaultTask {
         ConfigExtension config = project.localization
         def resDir = config.outputDirectory ?: project.file('src/main/res')
         new ParserEngine(config, resDir).parseSpreadsheet()
+
+        if (config.report != null && !config.report.exists()) {
+            config.report.mkdir()
+        }
+        if (config.outputDirectory != null && config.inputDirectory != null) {
+            new XmlUpdate().update(config)
+        }
     }
 }
