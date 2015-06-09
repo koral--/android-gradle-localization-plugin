@@ -10,18 +10,6 @@ class ParseXLSXTest extends LocalizationPluginTestBase {
         def file = new File(getClass().getResource(name).getPath())
         ConfigExtension config = new ConfigExtension()
         config.xlsFile = file
-        testXlsx(config)
-    }
-
-    @Test
-    void testXlsxURI() {
-        def name = 'valid.xlsx'
-        ConfigExtension config = new ConfigExtension()
-        config.xlsFileURI = getClass().getResource(name)
-        testXlsx(config)
-    }
-
-    static void testXlsx(ConfigExtension config) {
         config.allowEmptyTranslations = true
         config.skipInvalidName = true
         config.skipDuplicatedName = true
@@ -31,6 +19,13 @@ class ParseXLSXTest extends LocalizationPluginTestBase {
         config.ignorableColumns.add("iOS")
         config.ignorableColumns.add("END")
         config.defaultLocaleQualifier = "en"
+        parseTestFile(config)
+    }
+
+    @Test
+    void testXlsxURI() {
+        ConfigExtension config = new ConfigExtension()
+        config.xlsFileURI = 'https://docs.google.com/a/droidsonroids.pl/spreadsheets/d/1sfE3Zk_7syHpq3HPKYQ9gRidm1W7c1IjIfdH1R8z9m4/export?format=xlsx'
         parseTestFile(config)
     }
 }
