@@ -23,4 +23,11 @@ class ParseXLSXTest extends LocalizationPluginTestBase {
         config.outputDirectory = new File(TEST_RES_DIR, "out");
         parseTestFile(config)
     }
+
+    @Test
+    void testXlsxURI() {
+        ConfigExtension config = new ConfigExtension()
+        config.xlsFileURI = 'https://docs.google.com/a/droidsonroids.pl/spreadsheets/d/1sfE3Zk_7syHpq3HPKYQ9gRidm1W7c1IjIfdH1R8z9m4/export?format=xlsx'
+        parseTestFile(config)
+    }
 }
