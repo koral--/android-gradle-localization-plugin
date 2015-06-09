@@ -53,9 +53,12 @@ class ParserEngine {
         }
 
         if (isCsv) {
-            mParser = config.csvStrategy ? new CSVParser((Reader) mCloseableInput, config.csvStrategy) : new CSVParser((Reader) mCloseableInput)
+            mParser = config.csvStrategy ?
+                    new CSVParser((Reader) mCloseableInput, config.csvStrategy)
+                    : new CSVParser((Reader) mCloseableInput)
         } else {
-            mParser = new XLSXParser(mCloseableInput, config.xlsFile.getAbsolutePath().endsWith("xls"), config.sheetName)
+            def isXls = config.xlsFile.getAbsolutePath().endsWith("xls")
+            mParser = new XLSXParser(mCloseableInput, isXls, config.sheetName)
         }
 
     }
@@ -82,9 +85,24 @@ class ParserEngine {
         final String mQualifier
         final MarkupBuilder mBuilder
 
-        XMLBuilder(String qualifier) {
+        private String getStringDirName(String qualifier) {
             def defaultValues = qualifier == mConfig.defaultColumnName
-            String valuesDirName = defaultValues ? 'values' : 'values-' + qualifier
+            String valuesDirName;
+            if (defaultValues) {
+                valuesDirName = "values";
+            } else {
+                def split = qualifier.split("_")
+                //zh-rCN
+                def s = split.length == 2 ? split[0].toLowerCase() + "-" + "r" +
+                        split[1].toUpperCase() : qualifier.toLowerCase()
+                valuesDirName = "values" + "-" + s
+            }
+            valuesDirName
+        }
+
+        XMLBuilder(String qualifier) {
+            String valuesDirName = getStringDirName(qualifier)
+
             File valuesDir = new File(mResDir, valuesDirName)
             if (!valuesDir.isDirectory()) {
                 valuesDir.mkdirs()
@@ -103,7 +121,9 @@ class ParserEngine {
 
         def addResource(body) {
             if (mQualifier == mConfig.defaultColumnName && mConfig.defaultLocaleQualifier != null)
-                mBuilder.resources(body, 'xmlns:tools': 'http://schemas.android.com/tools', 'tools:locale': mConfig.defaultLocaleQualifier)
+                mBuilder.resources(body
+                        , 'xmlns:tools': 'http://schemas.android.com/tools'
+                        , 'tools:locale': mConfig.defaultLocaleQualifier)
             else
                 mBuilder.resources(body)
         }
@@ -113,8 +133,19 @@ class ParserEngine {
         mCloseableInput.withCloseable {
             String[][] allCells = mParser.getAllValues()
             def header = parseHeader(allCells[0])
-            parseCells(header, allCells)
+            parseCells(header, getContent(allCells))
         }
+    }
+
+    private String[][] getContent(String[][] all){
+        String[][] result = new String[all.length - 1][];
+        for (int i = 1; i < all.length; i++) {
+            result[i - 1] = new String[all[i].length];
+            for (int j = 0; j < all[i].length; j++) {
+                result[i - 1][j] =  all[i][j];
+            }
+        }
+        return result;
     }
 
     private parseCells(final SourceInfo sourceInfo, String[][] cells) throws IOException {
@@ -144,6 +175,10 @@ class ParserEngine {
                     }
 
                     String name = row[sourceInfo.mNameIdx]
+                    if(mConfig.ignorableNames != null && mConfig.ignorableNames.contains(name)){
+                        continue
+                    }
+
                     def value = row[j]
 
                     String comment = null
@@ -194,11 +229,11 @@ class ParserEngine {
                         value = value.replace("\"", "\\\"")
                     if (mConfig.escapeNewLines)
                         value = value.replace("\n", "\\n")
-                    if (value.startsWith(' ') || value.endsWith(' '))
-                        value = '"' + value + '"'
+//                    if (value.startsWith(' ') || value.endsWith(' '))
+//                        value = '"' + value + '"'
                     if (mConfig.convertTripleDotsToHorizontalEllipsis)
                         value = value.replace("...", "…")
-                    value = value.replace("?", "\\?")
+//                    value = value.replace("?", "\\?")
                     if (mConfig.normalizationForm)
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
 
