@@ -9,32 +9,50 @@ import java.text.Normalizer
  * @author koral--
  */
 class ConfigExtension {
-    boolean allowNonTranslatableTranslation = false
-    boolean allowEmptyTranslations = false
-    boolean escapeApostrophes = true
-    boolean escapeQuotes = true
-    boolean escapeNewLines = true
-    boolean convertTripleDotsToHorizontalEllipsis = true
-    boolean escapeSlashes = true
-    TagEscapingStrategy tagEscapingStrategy = TagEscapingStrategy.IF_TAGS_ABSENT
-    Normalizer.Form normalizationForm = Normalizer.Form.NFC
-    String defaultColumnName = 'default'
-    String nameColumnName = 'name'
-    String translatableColumnName = 'translatable'
-    String formattedColumnName = 'formatted'
-    String commentColumnName = 'comment'
+    //Source File
     File csvFile
     String csvFileURI
     String csvGenerationCommand
     File xlsFile
     String xlsFileURI
-    File outputDirectory
     String sheetName
-    List<String> ignorableColumns = []
-    CSVStrategy csvStrategy
-    String outputFileName = 'strings.xml'
-    String outputIndent = '  '
+
+    //Name
+    String defaultLocaleQualifier
     boolean skipInvalidName
     boolean skipDuplicatedName
-    String defaultLocaleQualifier
+    List<String> ignorableColumns = []
+    String nameColumnName = 'Android'
+    String defaultColumnName = 'EN'
+    String translatableColumnName = 'translatable'
+    String formattedColumnName = 'formatted'
+    String commentColumnName = 'comment'
+    List<String> ignorableNames = []
+
+    //Escape
+    boolean allowNonTranslatableTranslation = false
+    boolean allowEmptyTranslations = false
+    boolean escapeApostrophes = true
+    boolean escapeQuotes = true
+    boolean escapeNewLines = false
+    boolean convertTripleDotsToHorizontalEllipsis = false
+    boolean escapeSlashes = false
+
+    //Strategy
+    TagEscapingStrategy tagEscapingStrategy = TagEscapingStrategy.IF_TAGS_ABSENT
+    Normalizer.Form normalizationForm = Normalizer.Form.NFC
+    CSVStrategy csvStrategy
+
+    //Output
+    String outputFileName = 'strings.xml'
+    String outputIndent = '  '
+    File outputDirectory
+
+    //Xml update
+    File inputDirectory
+    File report
+    Map<String, String> map
+    boolean append
+    boolean replace
+
 }

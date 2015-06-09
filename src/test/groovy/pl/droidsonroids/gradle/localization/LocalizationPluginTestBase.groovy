@@ -4,6 +4,8 @@ import org.gradle.testfixtures.ProjectBuilder
 
 abstract class LocalizationPluginTestBase {
 
+    static File TEST_RES_DIR = new File("src/test/resources/pl/droidsonroids/gradle/localization");
+
     void parseTestFile(String fileName) {
         def config = new ConfigExtension()
         config.csvFileURI = getClass().getResource(fileName).toURI()
@@ -15,7 +17,7 @@ abstract class LocalizationPluginTestBase {
         def resDir = project.file('src/main/res')
 
         try {
-            new ParserEngine(config, resDir).parseSpreadsheet()
+            new ParserEngine(config, config.outputDirectory).parseSpreadsheet()
         }
         finally {
             resDir.deleteDir()

@@ -1,6 +1,4 @@
-language:
-  - groovy
 jdk:
   - oraclejdk8
 script:
-  - ./gradlew build --info
+  - ./gradlew build --info --stacktrace
