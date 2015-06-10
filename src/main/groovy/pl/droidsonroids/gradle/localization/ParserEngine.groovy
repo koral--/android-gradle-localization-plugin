@@ -141,6 +141,8 @@ class ParserEngine {
             //the key indicate all language string
             def keys = new HashSet(cells.length)
             builder.addResource({
+                if (cells.length <= 1)
+                    return
                 def stringAttrs = new LinkedHashMap<>(2)
                 def pluralsMap = new HashMap<String, HashSet<PluralItem>>()
                 def arrays = new HashMap<String, List<StringArrayItem>>()
