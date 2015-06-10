@@ -17,10 +17,10 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
 //        def map = getMap(new File(getClass().getResource('res').getPath()))
 
 //        writer(file, map)
-        def lanuages = ['', 'cs', 'de', 'es', 'fr', 'hu', 'it', 'ja', 'ko', 'nl', 'pl', 'pt-rBR',
+        def languages = ['', 'cs', 'de', 'es', 'fr', 'hu', 'it', 'ja', 'ko', 'nl', 'pl', 'pt-rBR',
                         'ru', 'sv', 'zh-rCN', 'zh-rTW'] as String[]
         def sourceDir = new File(srcDirPath)
-        def files = filter(sourceDir, lanuages)
+        def files = filter(sourceDir, languages)
         def map = getMap(files);
 
         def outFile = new File(outPath)

@@ -21,6 +21,7 @@ class ConfigExtension {
     String defaultLocaleQualifier
     boolean skipInvalidName
     boolean skipDuplicatedName
+    Integer nameColumnIndex
     List<String> ignorableColumns = []
     String nameColumnName = 'Android'
     String defaultColumnName = 'EN'

@@ -144,19 +144,8 @@ class ParserEngine {
         mCloseableInput.withCloseable {
             String[][] allCells = mParser.getAllValues()
             def header = parseHeader(allCells[0])
-            parseCells(header, getContent(allCells))
+            parseCells(header, allCells)
         }
-    }
-
-    private String[][] getContent(String[][] all){
-        String[][] result = new String[all.length - 1][];
-        for (int i = 1; i < all.length; i++) {
-            result[i - 1] = new String[all[i].length];
-            for (int j = 0; j < all[i].length; j++) {
-                result[i - 1][j] =  all[i][j];
-            }
-        }
-        return result;
     }
 
     private parseCells(final SourceInfo sourceInfo, String[][] cells) throws IOException {
@@ -169,10 +158,12 @@ class ParserEngine {
             //the key indicate all language string
             def keys = new HashSet(cells.length)
             builder.addResource({
+                if (cells.length <= 1)
+                    return
                 def stringAttrs = new LinkedHashMap<>(2)
                 def pluralsMap = new HashMap<String, HashSet<PluralItem>>()
                 def arrays = new HashMap<String, List<StringArrayItem>>()
-                for (i in 0..cells.length - 1) {
+                for (i in 1..cells.length - 1) {
                     String[] row = cells[i]
                     if (row == null) {
                         continue
