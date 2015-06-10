@@ -144,7 +144,7 @@ class ParserEngine {
                 def stringAttrs = new LinkedHashMap<>(2)
                 def pluralsMap = new HashMap<String, HashSet<PluralItem>>()
                 def arrays = new HashMap<String, List<StringArrayItem>>()
-                for (i in 0..cells.length - 1) {
+                for (i in 1..cells.length - 1) {
                     String[] row = cells[i]
                     if (row == null) {
                         continue

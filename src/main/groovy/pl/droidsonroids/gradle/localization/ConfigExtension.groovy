@@ -37,4 +37,5 @@ class ConfigExtension {
     boolean skipInvalidName
     boolean skipDuplicatedName
     String defaultLocaleQualifier
+    Integer nameColumnIndex
 }
