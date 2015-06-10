@@ -1,3 +1,6 @@
+### 1.0.9
+- task description added
+- header parsing fixed
 ### 1.0.8
 - XLS(X) input support added
 - non-translatable plurals support added
