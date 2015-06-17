@@ -141,3 +141,6 @@ jacocoTestReport {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
 }
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_7
