@@ -14,6 +14,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'jacoco'
+apply from: 'mvn-push.gradle'
 
 repositories {
     mavenCentral()
@@ -22,7 +23,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile localGroovy()
+    compile 'org.codehaus.groovy:groovy:2.4.3'
     compile 'org.marketcetera.fork:commons-csv:2.4.2'
     compile 'org.apache.poi:ooxml-schemas:1.1'
     compile 'org.apache.poi:poi-ooxml:3.12'
@@ -33,75 +34,6 @@ dependencies {
 
 group = GROUP
 version = VERSION_NAME
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment {
-                MavenDeployment deployment -> signing.signPom(deployment)
-            }
-
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-            }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-            }
-
-            pom.groupId = GROUP
-            pom.artifactId = POM_ARTIFACT_ID
-            pom.version = VERSION_NAME
-
-            pom.project {
-                name POM_NAME
-                packaging POM_PACKAGING
-                description POM_DESCRIPTION
-                url POM_URL
-
-                scm {
-                    url POM_SCM_URL
-                    connection POM_SCM_CONNECTION
-                    developerConnection POM_SCM_DEV_CONNECTION
-                }
-
-                licenses {
-                    license {
-                        name POM_LICENCE_NAME
-                        url POM_LICENCE_URL
-                        distribution POM_LICENCE_DIST
-                    }
-                }
-
-                developers {
-                    developer {
-                        id POM_DEVELOPER_ID
-                        name POM_DEVELOPER_NAME
-                    }
-                }
-            }
-        }
-    }
-}
-
-task javadocsJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-signing {
-    required { gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocsJar
-}
 
 bintray {
     user = POM_DEVELOPER_ID
@@ -121,14 +53,14 @@ pluginBundle {
     plugins {
         localizationPlugin {
             id = 'pl.droidsonroids.localization'
-            displayName = 'Android gradle localization plugin'
-            description = 'Gradle plugin for generating localized Android resources'
+            displayName = POM_NAME
+            description = POM_DESCRIPTION
         }
     }
 }
 
 jacoco {
-    toolVersion = '0.7.4.201502262128'
+    toolVersion = '0.7.5.201505241946'
 }
 
 jacocoTestReport {
