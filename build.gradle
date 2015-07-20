@@ -6,7 +6,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.plugin-publish' version '0.9.0'
+    id 'com.gradle.plugin-publish' version '0.9.1'
     id 'com.jfrog.bintray' version '1.2'
 }
 
@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.codehaus.groovy:groovy:2.4.3'
+    compile 'org.codehaus.groovy:groovy:2.4.4'
     compile 'org.marketcetera.fork:commons-csv:2.4.2'
     compile 'org.apache.poi:ooxml-schemas:1.1'
     compile 'org.apache.poi:poi-ooxml:3.12'
