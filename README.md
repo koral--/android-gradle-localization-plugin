@@ -9,8 +9,8 @@ This plugin generates Android string resource XML files from CSV or XLS(X) file.
 Generation has to be invoked as additional gradle task. Java 1.8 is required.
  
 ##Supported features
- * string arrays
- * plurals
+ * string arrays - see [Arrays](https://github.com/koral--/android-gradle-localization-plugin/wiki/Arrays)
+ * plurals - see [Plurals](https://github.com/koral--/android-gradle-localization-plugin/wiki/Plurals)
  * non-translatable resources - `translatable` XML attribute
  * auto-escaping double quotes, apostrophes and newlines
  * auto-quoting leading and trailing spaces
@@ -24,7 +24,7 @@ Generation has to be invoked as additional gradle task. Java 1.8 is required.
 In whichever `build.gradle` file.
 ```
 plugins {
-  id 'pl.droidsonroids.localization' version '1.0.8'
+  id 'pl.droidsonroids.localization' version '1.0.9'
 }
 ```
 Note: exact version number must be specified, `+` cannot be used as wildcard.
@@ -39,7 +39,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
          jcenter()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:1.2.3'
+         classpath 'com.android.tools.build:gradle:1.3.1'
          classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.8'
      }
  }
