@@ -2,5 +2,6 @@ sudo: false
 jdk:
   - oraclejdk8
 script:
-   ./gradlew build jacocoTestReport --info --stacktrace
+  - ./gradlew build jacocoTestReport --info --stacktrace
+after_success:
   - bash <(curl -s https://codecov.io/bash)
