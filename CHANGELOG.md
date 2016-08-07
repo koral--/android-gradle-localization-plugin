@@ -1,6 +1,6 @@
 ### 1.0.10
 - `nameColumnIndex` extension property added #23
--
+- dependencies versions bump
 
 ### 1.0.9
 - task description added
