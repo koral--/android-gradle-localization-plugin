@@ -12,7 +12,7 @@ class XMLBuilder {
             def defaultValues = qualifier == mConfig.defaultColumnName
             String valuesDirName = defaultValues ? 'values' : 'values-' + qualifier
             File valuesDir = new File(mResDir, valuesDirName)
-            if (!valuesDir.isDirectory()) {
+            if (!valuesDir.directory) {
                 valuesDir.mkdirs()
             }
             File valuesFile = new File(valuesDir, mConfig.outputFileName)
@@ -24,7 +24,7 @@ class XMLBuilder {
             mBuilder.setDoubleQuotes(true)
             mBuilder.setOmitNullAttributes(true)
             mQualifier = qualifier
-            mBuilder.getMkp().xmlDeclaration(version: '1.0', encoding: 'UTF-8')
+            mBuilder.mkp.xmlDeclaration(version: '1.0', encoding: 'UTF-8')
         }
 
         def addResource(body) {

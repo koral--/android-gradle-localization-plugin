@@ -39,7 +39,7 @@ class ParserEngine {
             def shellCommand = config.csvGenerationCommand.split('\\s+')
             def redirect = ProcessBuilder.Redirect.INHERIT
             def process = new ProcessBuilder(shellCommand).redirectError(redirect).start()
-            mCloseableInput = Utils.wrapReader(new InputStreamReader(process.getInputStream()))
+            mCloseableInput = Utils.wrapReader(new InputStreamReader(process.inputStream))
             sourceType = SourceType.CSV
         } else if (config.csvFile != null) {
             mCloseableInput = Utils.wrapReader(new FileReader(config.csvFile))
@@ -50,10 +50,10 @@ class ParserEngine {
         } else if (config.xlsFileURI != null) {
             final url = new URL(config.xlsFileURI)
             mCloseableInput = Utils.wrapInputStream(url.openStream())
-            sourceType = url.getPath().endsWith("xls") ? SourceType.XLS : SourceType.XLSX
+            sourceType = url.path.endsWith("xls") ? SourceType.XLS : SourceType.XLSX
         } else if (config.xlsFile != null) {
             mCloseableInput = Utils.wrapInputStream(new FileInputStream(config.xlsFile))
-            sourceType = config.xlsFile.getAbsolutePath().endsWith("xls") ? SourceType.XLS : SourceType.XLSX
+            sourceType = config.xlsFile.absolutePath.endsWith("xls") ? SourceType.XLS : SourceType.XLSX
         } else {
             throw new IllegalStateException()
         }
@@ -105,7 +105,7 @@ class ParserEngine {
                     def value = row[j]
 
                     String comment = null
-                    if (sourceInfo.mCommentIndex >= 0 && !row[sourceInfo.mCommentIndex].isEmpty()) {
+                    if (sourceInfo.mCommentIndex >= 0 && !row[sourceInfo.mCommentIndex].empty) {
                         comment = row[sourceInfo.mCommentIndex]
                     }
                     def indexOfOpeningBrace = name.indexOf('[')

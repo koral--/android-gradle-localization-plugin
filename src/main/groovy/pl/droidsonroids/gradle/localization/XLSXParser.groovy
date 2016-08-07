@@ -17,13 +17,13 @@ class XLSXParser {
         Sheet sheet = sheetName ? workbook.getSheet(sheetName) : workbook.getSheetAt(0)
         if (sheet == null)
             throw new IllegalArgumentException("Sheet $sheetName does not exist")
-        mAllCells = new String[sheet.getLastRowNum()][]
-        for (int i = 0; i < sheet.getLastRowNum(); i++) {
+        mAllCells = new String[sheet.lastRowNum][]
+        for (int i = 0; i < sheet.lastRowNum; i++) {
             Row row = sheet.getRow(i)
             if (row == null)
                 continue
-            mAllCells[i] = new String[row.getLastCellNum()]
-            for (int j = 0; j < row.getLastCellNum(); j++) {
+            mAllCells[i] = new String[row.lastCellNum]
+            for (int j = 0; j < row.lastCellNum; j++) {
                 mAllCells[i][j] = row.getCell(j).toString() ?: ""
             }
         }
