@@ -10,13 +10,13 @@ class XLSXParser {
 
     private String[][] mAllCells
 
-    XLSXParser(InputStream inputStream, boolean isXls, String sheetName) throws IOException {
+    XLSXParser(InputStream inputStream, boolean isXls, String sheetName) {
         Workbook workbook = isXls ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream)
         workbook.setMissingCellPolicy(Row.CREATE_NULL_AS_BLANK)
 
         Sheet sheet = sheetName ? workbook.getSheet(sheetName) : workbook.getSheetAt(0)
         if (sheet == null)
-            throw new IOException("Sheet " + sheetName + " does not exist")
+            throw new IllegalArgumentException("Sheet $sheetName does not exist")
         mAllCells = new String[sheet.getLastRowNum()][]
         for (int i = 0; i < sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i)

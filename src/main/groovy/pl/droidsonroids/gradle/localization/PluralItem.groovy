@@ -28,9 +28,6 @@ class PluralItem {
 
     @Override
     public String toString() {
-        return "PluralItem{" +
-                "value='" + value + '\'' +
-                ", quantity=" + quantity +
-                '}';
+        return "PluralItem{value='$value', quantity=$quantity}";
     }
 }

@@ -39,8 +39,8 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
          jcenter()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:1.3.1'
-         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.8'
+         classpath 'com.android.tools.build:gradle:2.1.2'
+         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.9'
      }
  }
  ```
@@ -112,13 +112,14 @@ so it could be seen in the gradle console.
 #### Spreadsheet format:
 * `defaultColumnName` - default=`'default'`, name of the column which corresponds to default localization
 (`values` folder)
-* `nameColumnName` - default=`'name'`, name of the column containing key names (source for the `name`
-XML attribute)
+* `nameColumnIndex` - default=unset (`nameColumnName` is taken into account), index of the column containing key names (source for the `name` XML attribute)
+* `nameColumnName` - default=`'name'` (if `nameColumnIndex` is not present), name of the column containing key names (source for the `name` XML attribute)
 * `translatableColumnName` - default=`'translatable'`, name of the column containing translatable flags
 (source for the `translatable` XML attribute)
 * `commentColumnName` - default=`'comment'`, name of the column containing comments
-* `formattedColumnName` - default=`'formatted'`, name of the column formatted flags
-                                                                    (source for the `formatted` XML attribute)
+* `formattedColumnName` - default=`'formatted'`, name of the column formatted flags (source for the `formatted` XML attribute)
+
+If both `nameColumnIndex` and `nameColumnName` are specified exception is thrown.
 
 The following options turn off some character escaping and substitutions, can be useful if you have 
 something already escaped in CSV:

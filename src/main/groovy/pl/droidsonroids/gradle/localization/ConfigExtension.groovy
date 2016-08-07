@@ -19,7 +19,8 @@ class ConfigExtension {
     TagEscapingStrategy tagEscapingStrategy = TagEscapingStrategy.IF_TAGS_ABSENT
     Normalizer.Form normalizationForm = Normalizer.Form.NFC
     String defaultColumnName = 'default'
-    String nameColumnName = 'name'
+    Integer nameColumnIndex
+    String nameColumnName
     String translatableColumnName = 'translatable'
     String formattedColumnName = 'formatted'
     String commentColumnName = 'comment'
@@ -37,5 +38,4 @@ class ConfigExtension {
     boolean skipInvalidName
     boolean skipDuplicatedName
     String defaultLocaleQualifier
-    Integer nameColumnIndex
 }

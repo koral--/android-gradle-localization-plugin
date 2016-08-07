@@ -1,3 +1,7 @@
+### 1.0.10
+- `nameColumnIndex` extension property added #23
+-
+
 ### 1.0.9
 - task description added
 - header parsing fixed

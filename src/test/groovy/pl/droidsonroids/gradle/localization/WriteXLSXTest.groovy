@@ -65,7 +65,7 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
     }
 
     private
-    static void writer(File file, Map<String, HashMap<String, String>> map) throws IOException {
+    static void writer(File file, Map<String, HashMap<String, String>> map) {
         Workbook workbook = file.getAbsolutePath().endsWith("xls") ?
                 new HSSFWorkbook() : new XSSFWorkbook();
         Sheet sheet1 = (Sheet) workbook.createSheet("sheet1");

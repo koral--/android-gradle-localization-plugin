@@ -18,7 +18,7 @@ class ParseCSVTest extends LocalizationPluginTestBase {
         parseTestFile('valid.csv')
     }
 
-    @Test(expected = IOException.class)
+    @Test(expected = IllegalArgumentException.class)
     void testMissingTranslation() {
         println 'testing invalid file'
         parseTestFile('missing_translation.csv')

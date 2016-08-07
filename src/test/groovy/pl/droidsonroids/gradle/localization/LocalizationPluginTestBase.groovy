@@ -10,7 +10,7 @@ abstract class LocalizationPluginTestBase {
         parseTestFile(config)
     }
 
-    static void parseTestFile(ConfigExtension config) throws IOException {
+    static void parseTestFile(ConfigExtension config) {
         def project = ProjectBuilder.builder().build()
         def resDir = project.file('src/main/res')
 
