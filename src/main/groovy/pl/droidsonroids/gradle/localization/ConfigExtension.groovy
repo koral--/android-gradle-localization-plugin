@@ -24,6 +24,7 @@ class ConfigExtension {
     String translatableColumnName = 'translatable'
     String formattedColumnName = 'formatted'
     String commentColumnName = 'comment'
+    String tagEscapingStrategyColumnName
     File csvFile
     String csvFileURI
     String csvGenerationCommand

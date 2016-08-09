@@ -5,6 +5,7 @@ class SourceInfo {
     final int mCommentIndex
     final int mTranslatableIndex
     final int mFormattedIndex
+    final int mTagEscapingStrategyIndex
     final int mNameIdx
     final int mColumnsCount
 
@@ -19,6 +20,7 @@ class SourceInfo {
         mTranslatableIndex = header.indexOf(config.translatableColumnName)
         mCommentIndex = header.indexOf(config.commentColumnName)
         mFormattedIndex = header.indexOf(config.formattedColumnName)
+        mTagEscapingStrategyIndex = header.indexOf(config.tagEscapingStrategyColumnName)
 
         if (config.nameColumnIndex != null) {
             if (config.nameColumnName != null) {

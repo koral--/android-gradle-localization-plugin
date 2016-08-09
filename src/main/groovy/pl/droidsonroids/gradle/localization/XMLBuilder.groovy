@@ -21,8 +21,8 @@ class XMLBuilder {
             def streamWriter = new OutputStreamWriter(outputStream, 'UTF-8')
             mBuilder = new MarkupBuilder(new IndentPrinter(streamWriter, mConfig.outputIndent))
 
-            mBuilder.setDoubleQuotes(true)
-            mBuilder.setOmitNullAttributes(true)
+            mBuilder.doubleQuotes = true
+            mBuilder.omitNullAttributes = true
             mQualifier = qualifier
             mBuilder.mkp.xmlDeclaration(version: '1.0', encoding: 'UTF-8')
         }

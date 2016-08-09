@@ -122,11 +122,11 @@ so it could be seen in the gradle console.
 If both `nameColumnIndex` and `nameColumnName` are specified exception is thrown.
 
 The following options turn off some character escaping and substitutions, can be useful if you have 
-something already escaped in CSV:
+something already escaped in source:
 * `escapeApostrophes` - default=`true`, if set to false apostrophes (`'`) won't be escaped
 * `escapeQuotes` - default=`true`, if set to false double quotes (`"`)  won't be escaped
 * `escapeNewLines` - default=`true`, if set to false newline characters won't be escaped
-* `convertTripleDotsToHorizontalEllipsis` - default=`true`, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230`
+* `convertTripleDotsToHorizontalEllipsis` - default=`true`, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230;`
 * `escapeSlashes` - default=`true`, if set to false slashes (`\`) won't be escaped
 * `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC) if set to `null` Unicode normalization won't be performed, see [javadoc of Normalizer](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
 for more details
@@ -135,7 +135,7 @@ possible values:
  * `ALWAYS` - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML
  * `NEVER` - brackets are never escaped. Eg. "&lt;" in source is passed without change to output XML
  * `IF_TAGS_ABSENT` - Brackets aren't escaped if text contains tags. Eg.
-   &lt;b&gt;bold&lt;/b&gt;} will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
+   &lt;b&gt;bold&lt;/b&gt; will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
    See [JSoup](http://jsoup.org) - library used to detect tags
 
 #### CSV format:

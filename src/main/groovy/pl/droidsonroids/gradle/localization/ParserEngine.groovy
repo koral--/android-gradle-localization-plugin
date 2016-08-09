@@ -80,7 +80,7 @@ class ParserEngine {
             if (builder == null) {
                 continue
             }
-            //the key indicate all language string
+
             def keys = new HashSet(cells.length)
             builder.addResource({
                 if (cells.length <= 1)
@@ -188,18 +188,25 @@ class ParserEngine {
                             continue
                         throw new IllegalArgumentException("$name is duplicated in row #${i + 1}")
                     }
+                    TagEscapingStrategy strategy = mConfig.tagEscapingStrategy
+                    if (sourceInfo.mTagEscapingStrategyIndex >= 0) {
+                        def strategyName = row[sourceInfo.mTagEscapingStrategyIndex]
+                        if (strategyName) {
+                            strategy = TagEscapingStrategy.valueOf(strategyName)
+                        }
+                    }
                     string(stringAttrs) {
-                        yieldValue(mkp, value)
+                        yieldValue(mkp, value, strategy)
                     }
                     if (comment) {
                         mkp.comment(comment)
                     }
                 }
-                for (Map.Entry<String, HashSet<PluralItem>> entry : pluralsMap) {
-                    plurals([name: entry.key]) {
-                        if (entry.value.empty)
-                            throw new IllegalArgumentException("At least one quantity string must be defined for key: $entry.key, qualifier $builder.mQualifier")
-                        for (PluralItem quantityEntry : entry.value) {
+                pluralsMap.each { key, value ->
+                    plurals([name: key]) {
+                        if (value.empty)
+                            throw new IllegalArgumentException("At least one quantity string must be defined for key: $key, qualifier $builder.mQualifier")
+                        value.each { quantityEntry ->
                             item(quantity: quantityEntry.quantity) {
                                 yieldValue(mkp, quantityEntry.value)
                             }
@@ -208,9 +215,9 @@ class ParserEngine {
                         }
                     }
                 }
-                for (Map.Entry<String, List<StringArrayItem>> entry : arrays) {
-                    'string-array'([name: entry.key, translatable: translatableArrays[entry.key] ? null : 'false']) {
-                        for (StringArrayItem stringArrayItem : entry.value) {
+                arrays.each { key, value ->
+                    'string-array'([name: key, translatable: translatableArrays[key] ? null : 'false']) {
+                        value.each { stringArrayItem ->
                             item {
                                 yieldValue(mkp, stringArrayItem.value)
                             }
@@ -223,8 +230,8 @@ class ParserEngine {
         }
     }
 
-    private void yieldValue(MarkupBuilderHelper mkp, String value) {
-        if (mConfig.tagEscapingStrategy == ALWAYS || (mConfig.tagEscapingStrategy == IF_TAGS_ABSENT && Utils.containsNoTags(value)))
+    private void yieldValue(MarkupBuilderHelper mkp, String value, TagEscapingStrategy strategy = mConfig.tagEscapingStrategy) {
+        if (strategy == ALWAYS || (strategy == IF_TAGS_ABSENT && Utils.containsNoTags(value)))
             mkp.yield(value)
         else
             mkp.yieldUnescaped(value)
