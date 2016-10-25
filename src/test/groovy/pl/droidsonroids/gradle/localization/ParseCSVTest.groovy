@@ -9,6 +9,7 @@ class ParseCSVTest extends LocalizationPluginTestBase {
     void testCsvFileConfig() {
         def config = new ConfigExtension()
         config.csvFile = new File(getClass().getResource('valid.csv').getPath())
+        config.tagEscapingStrategyColumnName = 'tagEscapingStrategy'
         parseTestFile(config)
     }
 

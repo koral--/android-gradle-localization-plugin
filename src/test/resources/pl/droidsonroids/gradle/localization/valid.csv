@@ -1,4 +1,4 @@
-name        ,default    ,pl         ,comment    ,translatable,formatted
+name        ,default    ,pl         ,comment    ,translatable,formatted,tagEscapingStrategy
 app         ,Application, ,,false
 cow[one]  ,cow      ,krowa
 file        ,File       ,"Plik"     ,file label ,
@@ -8,3 +8,4 @@ days[],tuesday,,,
 days[],wednesday,,,
 
 percent,%d %s,,,false,false
+tag,<b>test</b>,,,false,false,ALWAYS

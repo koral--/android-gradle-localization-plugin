@@ -7,6 +7,7 @@ abstract class LocalizationPluginTestBase {
     void parseTestFile(String fileName) {
         def config = new ConfigExtension()
         config.csvFileURI = getClass().getResource(fileName).toURI()
+        config.tagEscapingStrategyColumnName = 'tagEscapingStrategy'
         parseTestFile(config)
     }
 

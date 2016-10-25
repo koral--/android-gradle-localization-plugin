@@ -44,6 +44,9 @@ class SourceInfo {
         }
 
         def reservedColumns = [config.commentColumnName, config.translatableColumnName, config.formattedColumnName]
+        if (config.tagEscapingStrategyColumnName != null) {
+            reservedColumns.add(config.tagEscapingStrategyColumnName)
+        }
         reservedColumns.addAll(config.ignorableColumns)
 
         header.eachWithIndex { columnName, i ->

@@ -130,6 +130,8 @@ something already escaped in source:
 * `escapeSlashes` - default=`true`, if set to false slashes (`\`) won't be escaped
 * `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC) if set to `null` Unicode normalization won't be performed, see [javadoc of Normalizer](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
 for more details
+
+#### (X)HTML tags escaping
 * `tagEscapingStrategy` - default=`IF_TAGS_ABSENT`, defines X(H)TML tag brackets (&lt; and &gt;) escaping strategy
 possible values:
  * `ALWAYS` - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML
@@ -137,6 +139,8 @@ possible values:
  * `IF_TAGS_ABSENT` - Brackets aren't escaped if text contains tags. Eg.
    &lt;b&gt;bold&lt;/b&gt; will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
    See [JSoup](http://jsoup.org) - library used to detect tags
+* `tagEscapingStrategyColumnName` - default=unset (no column), name of the column containing non-default tag escaping strategy, if cell is non-empty then strategy
+ defined there is used instead of global one 
 
 #### CSV format:
 * `csvStrategy` - default=`null` (library default strategy, equivalent of
