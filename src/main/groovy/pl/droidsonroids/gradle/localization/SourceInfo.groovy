@@ -10,6 +10,10 @@ class SourceInfo {
     final int mColumnsCount
 
     SourceInfo(String[] headerLine, ConfigExtension config, File resDir) {
+        this(headerLine, config, resDir, config.outputFileName)
+    }
+
+    SourceInfo(String[] headerLine, ConfigExtension config, File resDir, String outputFileName) {
         if (headerLine == null || headerLine.length < 2) {
             throw new IllegalArgumentException("Invalid CSV header: $headerLine")
         }
@@ -51,7 +55,7 @@ class SourceInfo {
 
         header.eachWithIndex { columnName, i ->
             if (!(columnName in reservedColumns) && i != mNameIdx) {
-                mBuilders[i] = new XMLBuilder(columnName, config, resDir)
+                mBuilders[i] = new XMLBuilder(columnName, config, resDir, outputFileName)
             }
         }
     }
