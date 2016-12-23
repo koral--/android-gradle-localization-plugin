@@ -4,10 +4,12 @@ import org.junit.Test
 
 class ParseXLSXTest extends LocalizationPluginTestBase {
 
+    private static final RESOURCE_FOLDER = "src/test/resources/pl/droidsonroids/gradle/localization/"
+    private static final VALID_FILE_NAME = "valid.xlsx"
+
     @Test
     void testXlsxFile() {
-        def name = 'valid.xlsx'
-        def file = new File(getClass().getResource(name).getPath())
+        def file = new File(RESOURCE_FOLDER + VALID_FILE_NAME)
         ConfigExtension config = new ConfigExtension()
         config.xlsFile = file
         config.allowEmptyTranslations = true
