@@ -14,7 +14,7 @@ import static pl.droidsonroids.gradle.localization.TagEscapingStrategy.IF_TAGS_A
 class ParserEngine {
     private static
     final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
-    private final mParser
+    private final Parser mParser
     private final ConfigExtension mConfig
     private final File mResDir
     private final Closeable mCloseableInput
@@ -59,17 +59,26 @@ class ParserEngine {
         }
 
         if (sourceType == SourceType.CSV) {
-            mParser = config.csvStrategy ? new CSVParser((Reader) mCloseableInput, config.csvStrategy) : new CSVParser((Reader) mCloseableInput)
+            mParser = config.csvStrategy ? new CSVInnerParser((Reader) mCloseableInput, config.csvStrategy) : new CSVInnerParser((Reader) mCloseableInput)
         } else {
-            mParser = new XLSXParser((InputStream) mCloseableInput, sourceType == SourceType.XLS, config.sheetName)
+            mParser = new XLSXParser((InputStream) mCloseableInput, sourceType == SourceType.XLS, config.sheetName, config.multiSheets)
         }
     }
 
     void parseSpreadsheet() {
         mCloseableInput.withCloseable {
-            String[][] allCells = mParser.getAllValues()
-            def header = new SourceInfo(allCells[0], mConfig, mResDir)
-            parseCells(header, allCells)
+            Map<String, String[][]> sheets = mParser.getResult()
+            for (String sheetName: sheets.keySet()) {
+                String[][] allCells = sheets.get(sheetName)
+                String outputFileName;
+                if (sheetName != null) {
+                    outputFileName = sheetName + ".xml"
+                } else {
+                    outputFileName = mConfig.outputFileName
+                }
+                def header = new SourceInfo(allCells[0], mConfig, mResDir, outputFileName)
+                parseCells(header, allCells)
+            }
         }
     }
 

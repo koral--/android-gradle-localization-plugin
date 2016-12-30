@@ -7,7 +7,7 @@ class XMLBuilder {
         final MarkupBuilder mBuilder
         final ConfigExtension mConfig
 
-        XMLBuilder(String qualifier, ConfigExtension config, File mResDir) {
+        XMLBuilder(String qualifier, ConfigExtension config, File mResDir, String outputFileName) {
             mConfig = config
             def defaultValues = qualifier == mConfig.defaultColumnName
             String valuesDirName = defaultValues ? 'values' : 'values-' + qualifier
@@ -15,7 +15,7 @@ class XMLBuilder {
             if (!valuesDir.directory) {
                 valuesDir.mkdirs()
             }
-            File valuesFile = new File(valuesDir, mConfig.outputFileName)
+            File valuesFile = new File(valuesDir, outputFileName)
 
             def outputStream = new BufferedOutputStream(new FileOutputStream(valuesFile), Utils.BUFFER_SIZE)
             def streamWriter = new OutputStreamWriter(outputStream, 'UTF-8')
