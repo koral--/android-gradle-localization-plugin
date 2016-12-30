@@ -1,3 +1,7 @@
+### 1.0.11-SNAPSHOT
+- multisheet support added - (https://github.com/koral--/android-gradle-localization-plugin/pull/33)[#33]
+- dependencies versions bump
+
 ### 1.0.10
 - `nameColumnIndex` extension property added #23
 - dependencies versions bump
