@@ -1,12 +1,8 @@
-package pl.droidsonroids.gradle.localization;
+package pl.droidsonroids.gradle.localization
 
-import org.apache.commons.collections4.map.HashedMap;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVStrategy;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Map;
+import org.apache.commons.collections4.map.HashedMap
+import org.apache.commons.csv.CSVParser
+import org.apache.commons.csv.CSVStrategy
 
 /**
  * Created by Alexey Puchko on 12/22/16.

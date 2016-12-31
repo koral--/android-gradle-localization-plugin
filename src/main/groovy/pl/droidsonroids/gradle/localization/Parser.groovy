@@ -1,12 +1,8 @@
-package pl.droidsonroids.gradle.localization;
-
-import java.io.IOException;
-import java.util.Map;
-
+package pl.droidsonroids.gradle.localization
 /**
  * Created by Alexey Puchko on 12/22/16.
  */
 
 public interface Parser {
-    Map<String, String[][]> getResult() throws IOException;
+    Map<String, String[][]> getResult() throws IOException
 }

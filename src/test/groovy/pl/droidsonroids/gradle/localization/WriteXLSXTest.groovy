@@ -32,7 +32,7 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
         File[] files = new File[strs.length]
         int i = 0;
         strs.each {
-            def s = ''.equals(it) ? "values" : "values-" + it
+            def s = '' == it ? "values" : "values-$it"
             def var = dir.getPath() + "/" + s
             File file = new File(var, "strings.xml")
             if (file.exists()) {
@@ -54,7 +54,7 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
                 def name = it.attributes().get('name')
                 def value = it.value().text();
 
-                if (subDir.equals('values') && !map.containsKey(name)) {
+                if (subDir == 'values' && !map.containsKey(name)) {
                     HashMap<String, String> m = new HashMap<String, String>()
                     map.put(name, m)
                 }
