@@ -14,11 +14,9 @@ public enum TagEscapingStrategy
      */
             NEVER,
     /**
-     * Brackets aren't escaped if text contains tags.
-     * Eg. {@code
-     * <b>bold</b>} will be passed without change, but
-     * "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
-     * @see <a href="http://jsoup.org">JSoup</a> - library used to detect tags
+     * Brackets aren't escaped if text contains tags CDATA section.
+     * Eg. {@code <b>bold</b>} will be passed without change,
+     * but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
      */
             IF_TAGS_ABSENT
 }

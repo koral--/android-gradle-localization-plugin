@@ -1,26 +1,28 @@
 package pl.droidsonroids.gradle.localization
 
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 
 abstract class LocalizationPluginTestBase {
 
-    void parseTestFile(String fileName) {
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder()
+
+    File parseTestFile(String fileName) {
         def config = new ConfigExtension()
         config.csvFileURI = new File(fileName).toURI()
         config.tagEscapingStrategyColumnName = 'tagEscapingStrategy'
         parseTestFile(config)
     }
 
-    static void parseTestFile(ConfigExtension config) {
-        def project = ProjectBuilder.builder().build()
+    File parseTestFile(ConfigExtension config) {
+        def project = ProjectBuilder.builder()
+                .withProjectDir(temporaryFolder.root)
+                .build()
         def resDir = project.file('src/main/res')
-
-        try {
-            new ParserEngine(config, resDir).parseSpreadsheet()
-        }
-        finally {
-            resDir.deleteDir()
-        }
+        new ParserEngine(config, resDir).parseSpreadsheet()
+        return resDir
     }
 
 }

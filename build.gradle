@@ -28,7 +28,6 @@ dependencies {
     compile 'org.apache.poi:poi-ooxml-schemas:3.15'
     compile 'org.apache.poi:poi-ooxml:3.15'
     compile 'org.apache.poi:poi:3.15'
-    compile 'org.jsoup:jsoup:1.10.1'
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.6.0'
 }
@@ -75,3 +74,9 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_7
 
 uploadArchives.dependsOn test
+
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+    group = 'verification'
+}

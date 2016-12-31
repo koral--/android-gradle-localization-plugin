@@ -1,7 +1,6 @@
 package pl.droidsonroids.gradle.localization
 
 import groovy.xml.MarkupBuilderHelper
-import org.apache.commons.csv.CSVParser
 
 import java.text.Normalizer
 import java.util.regex.Pattern
@@ -59,9 +58,11 @@ class ParserEngine {
         }
 
         if (sourceType == SourceType.CSV) {
-            mParser = config.csvStrategy ? new CSVInnerParser((Reader) mCloseableInput, config.csvStrategy) : new CSVInnerParser((Reader) mCloseableInput)
+            def reader = (Reader) mCloseableInput
+            mParser = config.csvStrategy ? new CSVInnerParser(reader, config.csvStrategy) : new CSVInnerParser(reader)
         } else {
-            mParser = new XLSXParser((InputStream) mCloseableInput, sourceType == SourceType.XLS, config.sheetName, config.multiSheets)
+            def isXLS = sourceType == SourceType.XLS
+            mParser = new XLSXParser((InputStream) mCloseableInput, isXLS, config.sheetName, config.multiSheets)
         }
     }
 
@@ -240,7 +241,7 @@ class ParserEngine {
     }
 
     private void yieldValue(MarkupBuilderHelper mkp, String value, TagEscapingStrategy strategy = mConfig.tagEscapingStrategy) {
-        if (strategy == ALWAYS || (strategy == IF_TAGS_ABSENT && Utils.containsNoTags(value)))
+        if (strategy == ALWAYS || (strategy == IF_TAGS_ABSENT && Utils.containsHTML(value)))
             mkp.yield(value)
         else
             mkp.yieldUnescaped(value)

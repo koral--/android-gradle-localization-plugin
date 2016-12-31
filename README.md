@@ -136,11 +136,11 @@ for more details
 possible values:
  * `ALWAYS` - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML
  * `NEVER` - brackets are never escaped. Eg. "&lt;" in source is passed without change to output XML
- * `IF_TAGS_ABSENT` - Brackets aren't escaped if text contains tags. Eg.
+ * `IF_TAGS_ABSENT` - Brackets aren't escaped if text contains tags or CDATA section. Eg.
    &lt;b&gt;bold&lt;/b&gt; will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
-   See [JSoup](http://jsoup.org) - library used to detect tags
-* `tagEscapingStrategyColumnName` - default=unset (no column), name of the column containing non-default tag escaping strategy, if cell is non-empty then strategy
- defined there is used instead of global one 
+ * `tagEscapingStrategyColumnName` - default=unset (no column), name of the column containing non-default tag escaping strategy, if cell is non-empty then strategy 
+ defined there is used instead of global one
+  
 
 #### CSV format:
 * `csvStrategy` - default=`null` (library default strategy, equivalent of
