@@ -28,7 +28,7 @@ class XLSXParser implements Parser {
         }
     }
 
-    String[][] getAllValues(Sheet sheet) {
+    static String[][] getAllValues(Sheet sheet) {
         String[][] allCells = new String[sheet.lastRowNum + 1][]
         for (int i = 0; i <= sheet.lastRowNum; i++) {
             Row row = sheet.getRow(i)

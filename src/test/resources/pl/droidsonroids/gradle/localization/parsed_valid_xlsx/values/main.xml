@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="en">
+    <string name="app" translatable="false">Application</string>
+    <string name="file">File</string><!-- file label -->
+    <string name="percent" translatable="false" formatted="false">%d %s</string>
+    <string name="switch">this line should be ignored</string>
+    <plurals name="cow">
+        <item quantity="one">cow</item>
+        <item quantity="other">cows</item><!-- comment -->
+    </plurals>
+    <string-array name="days" translatable="false">
+        <item>monday</item>
+        <item>tuesday</item>
+        <item>wednesday</item>
+    </string-array>
+</resources>

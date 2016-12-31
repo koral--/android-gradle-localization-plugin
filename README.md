@@ -150,7 +150,9 @@ possible values:
  since documentation is quite incomplete
 
 #### XLS(X) format:
-* `sheetName` - default=`<name of the first sheet>`, name of the sheet to be parsed, only one can be specified
+* `sheetName` - default=`<name of the first sheet>`, name of the sheet to be processed, only one can be specified, 
+ignored if `multiSheets` is set to true
+* `multiSheets` - default=`false`, if set to true all sheets are processed and `sheetName` is ignored
 
 #### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
@@ -171,7 +173,7 @@ of throwing an exception. First rows with given key will be taken into account.
 
 #### Migration from versions <1.0.7:
 Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to true. Currently
-strings are always escaped when corresponding **parsed**  ceil contains leading or trailing spaces,
+strings are always escaped when corresponding **parsed**  cell contains leading or trailing spaces,
 but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default.
 If you want to include mentioned spaces in output set appropriate `csvStrategy`.
 
