@@ -10,11 +10,11 @@ class XLSXParser implements Parser {
 
     private Map<String, String[][]> mAllSheets
 
-    XLSXParser(InputStream inputStream, boolean isXls, String sheetName, boolean multiSheets) {
+    XLSXParser(InputStream inputStream, boolean isXls, String sheetName, boolean useAllSheets) {
         Workbook workbook = isXls ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream)
         workbook.setMissingCellPolicy(Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
 
-        if (multiSheets) {
+        if (useAllSheets) {
             mAllSheets = new HashMap<>(workbook.numberOfSheets)
             for (Sheet sheet : workbook.sheetIterator()) {
                 mAllSheets.put(sheet.getSheetName(), getAllValues(sheet))

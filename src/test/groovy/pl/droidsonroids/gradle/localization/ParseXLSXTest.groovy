@@ -26,7 +26,7 @@ class ParseXLSXTest extends LocalizationPluginTestBase {
         config.ignorableColumns.add('iOS')
         config.ignorableColumns.add('END')
         config.defaultLocaleQualifier = 'en'
-        config.multiSheets = true
+        config.useAllSheets = true
 
         def resDir = parseTestFile(config)
 

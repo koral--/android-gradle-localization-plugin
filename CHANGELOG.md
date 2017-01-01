@@ -1,6 +1,7 @@
 ### 1.0.11-SNAPSHOT
-- multisheet support added - (https://github.com/koral--/android-gradle-localization-plugin/pull/33)[#33]
+- multisheet support added - [#33](https://github.com/koral--/android-gradle-localization-plugin/pull/33)
 - dependencies versions bump
+- treating CDATA sections like tags in terms of `tagEscapingStrategy` so they are not escaped in `IF_TAGS_ABSENT` mode
 
 ### 1.0.10
 - `nameColumnIndex` extension property added #23
@@ -19,4 +20,4 @@
 - `formatted` attribute support added
 - ability to specify all custom column names added
 
-Updates also contain documentation updates, typofixes, and trivial code clean-ups.
+Changes also contain documentation updates, typofixes, and trivial code clean-ups.

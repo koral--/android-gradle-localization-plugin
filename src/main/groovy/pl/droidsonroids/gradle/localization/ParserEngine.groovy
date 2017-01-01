@@ -62,7 +62,7 @@ class ParserEngine {
             mParser = config.csvStrategy ? new CSVInnerParser(reader, config.csvStrategy) : new CSVInnerParser(reader)
         } else {
             def isXLS = sourceType == SourceType.XLS
-            mParser = new XLSXParser((InputStream) mCloseableInput, isXLS, config.sheetName, config.multiSheets)
+            mParser = new XLSXParser((InputStream) mCloseableInput, isXLS, config.sheetName, config.useAllSheets)
         }
     }
 
