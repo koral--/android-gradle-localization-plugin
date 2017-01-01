@@ -194,6 +194,7 @@ class ParserEngine {
                         continue
                     }
                     if (!keys.add(name)) {
+                        //TODO support case when first occurrence is marked non-translatable
                         if (mConfig.skipDuplicatedName)
                             continue
                         throw new IllegalArgumentException("$name is duplicated in row #${i + 1}")

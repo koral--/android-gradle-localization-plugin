@@ -4,6 +4,8 @@ import groovy.io.FileType
 import org.junit.Test
 import org.xmlunit.builder.DiffBuilder
 import org.xmlunit.builder.Input
+import org.xmlunit.diff.DefaultNodeMatcher
+import org.xmlunit.diff.ElementSelectors
 
 import static org.assertj.core.api.Assertions.assertThat
 
@@ -34,9 +36,10 @@ class ParseXLSXTest extends LocalizationPluginTestBase {
             def diff = DiffBuilder.compare(Input.fromFile(it))
                     .withTest(Input.fromURL(expectedFileURL))
                     .ignoreWhitespace()
+                    .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndAllAttributes))
                     .checkForSimilar()
                     .build()
-            assertThat(diff.hasDifferences()).as('file: %s has diff %s', filePath, diff.toString()).isFalse()
+            assertThat(diff.hasDifferences()).as('file: %s is different than expected %s', filePath, diff.toString()).isFalse()
         }
     }
 

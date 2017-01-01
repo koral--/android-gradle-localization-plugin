@@ -17,8 +17,10 @@ abstract class LocalizationPluginTestBase {
     }
 
     File parseTestFile(ConfigExtension config) {
+        def file = new File("/tmp/test")
+        file.deleteDir()
         def project = ProjectBuilder.builder()
-                .withProjectDir(temporaryFolder.root)
+                .withProjectDir(file)
                 .build()
         def resDir = project.file('src/main/res')
         new ParserEngine(config, resDir).parseSpreadsheet()

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
     <string name="file">Plik</string><!-- file label -->
-    <string name="percent"></string>
-    <string name="switch"></string>
+    <string name="empty"></string>
     <plurals name="cow">
-        <item quantity="one">krowa</item>
         <item quantity="other">krowy</item><!-- comment -->
+        <item quantity="one">krowa</item>
     </plurals>
 </resources>
