@@ -39,9 +39,15 @@ version = VERSION_NAME
 bintray {
     user = POM_DEVELOPER_ID
     key = BINTRAY_API_KEY
+    publish = true
     pkg {
         repo = 'maven'
         name = POM_ARTIFACT_ID
+        version {
+            name = VERSION_NAME
+            released = new Date()
+            vcsTag = "v$version"
+        }
     }
 }
 
