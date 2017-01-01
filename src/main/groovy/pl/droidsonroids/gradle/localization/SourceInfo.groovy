@@ -15,7 +15,7 @@ class SourceInfo {
 
     SourceInfo(String[] headerLine, ConfigExtension config, File resDir, String outputFileName) {
         if (headerLine == null || headerLine.length < 2) {
-            throw new IllegalArgumentException("Invalid CSV header: $headerLine")
+            throw new IllegalArgumentException("Invalid header: $headerLine")
         }
 
         List<String> header = Arrays.asList(headerLine)

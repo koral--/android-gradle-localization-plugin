@@ -12,15 +12,11 @@ import static pl.droidsonroids.gradle.localization.TagEscapingStrategy.IF_TAGS_A
 
 class ParserEngine {
     private static
-    final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
+    final Pattern JAVA_IDENTIFIER_REGEX = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*")
     private final Parser mParser
     private final ConfigExtension mConfig
     private final File mResDir
     private final Closeable mCloseableInput
-
-    enum SourceType {
-        CSV, XLS, XLSX
-    }
 
     ParserEngine(ConfigExtension config, File resDir) {
         def csvSources = [config.csvFileURI, config.csvFile, config.csvGenerationCommand,
@@ -71,7 +67,7 @@ class ParserEngine {
             Map<String, String[][]> sheets = mParser.getResult()
             for (String sheetName: sheets.keySet()) {
                 String[][] allCells = sheets.get(sheetName)
-                String outputFileName;
+                String outputFileName
                 if (sheetName != null) {
                     outputFileName = sheetName + ".xml"
                 } else {
@@ -237,7 +233,7 @@ class ParserEngine {
                         }
                     }
                 }
-            });
+            })
         }
     }
 

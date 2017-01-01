@@ -74,10 +74,11 @@ jacocoTestReport {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_7
 
-uploadArchives.dependsOn test
+uploadArchives.dependsOn check
 
 task copyTestResources(type: Copy) {
     from "${projectDir}/src/test/resources"
     into "${buildDir}/classes/test"
     group = 'verification'
+    description = 'To be used in Android Studio, workaround for https://code.google.com/p/android/issues/detail?id=64887'
 }

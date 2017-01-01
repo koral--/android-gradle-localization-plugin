@@ -11,17 +11,17 @@ import org.apache.commons.csv.CSVStrategy
 public class CSVInnerParser extends CSVParser implements Parser {
 
     public CSVInnerParser(Reader input) {
-        super(input);
+        super(input)
     }
 
     public CSVInnerParser(Reader input, CSVStrategy strategy) {
-        super(input, strategy);
+        super(input, strategy)
     }
 
     @Override
     public Map<String, String[][]> getResult() throws IOException {
-        Map<String, String[][]> result = new HashedMap<>(1);
-        result.put(null, getAllValues());
-        return result;
+        Map<String, String[][]> result = new HashedMap<>(1)
+        result.put(null, getAllValues())
+        return result
     }
 }
