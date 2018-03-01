@@ -9,6 +9,7 @@ import java.text.Normalizer
  * @author koral--
  */
 class ConfigExtension {
+    boolean handleEmptyTranslationsAsDefault = false;
     boolean allowNonTranslatableTranslation = false
     boolean allowEmptyTranslations = false
     boolean escapeApostrophes = true

@@ -144,6 +144,8 @@ class ParserEngine {
                     if (value.empty) {
                         if (!translatable && builder.mQualifier != mConfig.defaultColumnName)
                             continue
+                        if (mConfig.handleEmptyTranslationsAsDefault && builder.mQualifier != mConfig.defaultColumnName)
+                            continue
                         if (!mConfig.allowEmptyTranslations)
                             throw new IllegalArgumentException("$name is not translated to locale $builder.mQualifier, row #${i + 1}")
                     } else {
