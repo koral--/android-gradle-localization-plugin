@@ -160,6 +160,7 @@ contain column names eg. `['Section', 'Notes']`
 * `allowNonTranslatableTranslation` - default=`false`, if set to true resources marked
 non-translatable but translated are permitted
 * `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted
+* `handleEmptyTranslationsAsDefault` - default=`false`, if set to true empty values do not result in entries in non-default languages, i.e. no empty XML entries for non-default languages being created. If set to `true` then `allowEmptyTranslations` is ignored for all but default language
 * `outputFileName` - default=`strings.xml`, XML file name (with extension) which should be generated as an output
 * `outputIndent` - default=`  `(two spaces), character(s) used to indent each line in output XML files
 * `skipInvalidName` - default=`false`, if set to true then rows with invalid key names will be ignored instead
