@@ -1,4 +1,7 @@
-### 1.0.11-SNAPSHOT
+### 1.0.12
+- `handleEmptyTranslationsAsDefault` config parameter added - [#36](https://github.com/koral--/android-gradle-localization-plugin/pull/36)
+
+### 1.0.11
 - multisheet support added - [#33](https://github.com/koral--/android-gradle-localization-plugin/pull/33)
 - dependencies versions bump
 - treating CDATA sections like tags in terms of `tagEscapingStrategy` so they are not escaped in `IF_TAGS_ABSENT` mode
