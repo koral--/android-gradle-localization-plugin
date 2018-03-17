@@ -24,7 +24,7 @@ Generation has to be invoked as additional gradle task. Java 1.8 is required.
 In whichever `build.gradle` file.
 ```
 plugins {
-  id 'pl.droidsonroids.localization' version '1.0.11'
+  id 'pl.droidsonroids.localization' version '1.0.12'
 }
 ```
 Note: exact version number must be specified, `+` cannot be used as wildcard.
@@ -39,8 +39,8 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
          jcenter()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:2.2.3'
-         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.11'
+         classpath 'com.android.tools.build:gradle:3.0.1'
+         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.12'
      }
  }
  ```
