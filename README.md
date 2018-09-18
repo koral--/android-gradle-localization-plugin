@@ -57,7 +57,7 @@ Invoke `localization` gradle task. Task may be invoked from commandline or from 
  
  Non existent folders will be created. __WARNING__ existing XML files will be overwritten.
 
-##Example
+## Example
 The following CSV file:
 ```csv
 name,default    ,pl       ,comment   ,translatable
@@ -81,7 +81,7 @@ will produce 2 XML files:
 </resources>
 ```
 
-##Configuration
+## Configuration
 Add `localization` extension in `build.gradle` of particular module.
  ```
  localization
@@ -178,7 +178,7 @@ strings are always escaped when corresponding **parsed**  cell contains leading 
 but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default.
 If you want to include mentioned spaces in output set appropriate `csvStrategy`.
 
-##License
+## License
 
 MIT License<br>
 See [LICENSE](LICENSE) file.
