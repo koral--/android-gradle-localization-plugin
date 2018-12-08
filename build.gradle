@@ -44,8 +44,7 @@ pluginBundle {
     tags = ['localization', 'android']
 
     plugins {
-        localizationPlugin {
-            id = 'pl.droidsonroids.localization'
+        localization {
             displayName = POM_NAME
             description = POM_DESCRIPTION
         }
@@ -56,10 +55,6 @@ gradlePlugin {
     plugins {
         localization {
             id = 'pl.droidsonroids.localization'
-            implementationClass = 'pl.droidsonroids.gradle.localization.LocalizationPlugin'
-        }
-        legacy {
-            id = 'localization'
             implementationClass = 'pl.droidsonroids.gradle.localization.LocalizationPlugin'
         }
     }
