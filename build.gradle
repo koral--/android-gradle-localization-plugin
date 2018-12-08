@@ -11,6 +11,7 @@ plugins {
     id 'maven'
     id 'signing'
     id 'jacoco'
+    id 'java-gradle-plugin'
 }
 
 apply from: 'mvn-push.gradle'
@@ -47,6 +48,19 @@ pluginBundle {
             id = 'pl.droidsonroids.localization'
             displayName = POM_NAME
             description = POM_DESCRIPTION
+        }
+    }
+}
+
+gradlePlugin {
+    plugins {
+        localization {
+            id = 'pl.droidsonroids.localization'
+            implementationClass = 'pl.droidsonroids.gradle.localization.LocalizationPlugin'
+        }
+        legacy {
+            id = 'localization'
+            implementationClass = 'pl.droidsonroids.gradle.localization.LocalizationPlugin'
         }
     }
 }
