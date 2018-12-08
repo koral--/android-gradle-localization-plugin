@@ -66,7 +66,7 @@ gradlePlugin {
 }
 
 jacoco {
-    toolVersion = '0.7.8'
+    toolVersion = '0.7.9'
 }
 
 jacocoTestReport {
