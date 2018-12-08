@@ -21,7 +21,7 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
                         'ru', 'sv', 'zh-rCN', 'zh-rTW'] as String[]
         def sourceDir = new File(srcDirPath)
         def files = filter(sourceDir, lanuages)
-        def map = getMap(files);
+        def map = getMap(files)
 
         def outFile = new File(outPath)
         writer(outFile, map)
@@ -30,7 +30,7 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
 
     private static File[] filter(dir, strs) {
         File[] files = new File[strs.length]
-        int i = 0;
+        int i = 0
         strs.each {
             def s = '' == it ? "values" : "values-$it"
             def var = dir.getPath() + "/" + s
@@ -52,7 +52,7 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
             new XmlParser().parse(it).each {
                 it.toString()
                 def name = it.attributes().get('name')
-                def value = it.value().text();
+                def value = it.value().text()
 
                 if (subDir == 'values' && !map.containsKey(name)) {
                     HashMap<String, String> m = new HashMap<String, String>()
@@ -61,17 +61,17 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
                 map.get(name).put(subDir, value)
             }
         }
-        return map;
+        return map
     }
 
     private
     static void writer(File file, Map<String, HashMap<String, String>> map) {
         Workbook workbook = file.getAbsolutePath().endsWith("xls") ?
-                new HSSFWorkbook() : new XSSFWorkbook();
-        Sheet sheet1 = (Sheet) workbook.createSheet("sheet1");
+                new HSSFWorkbook() : new XSSFWorkbook()
+        Sheet sheet1 = (Sheet) workbook.createSheet("sheet1")
         int i = 0
         map.each {
-            Row row = (Row) sheet1.createRow(i);
+            Row row = (Row) sheet1.createRow(i)
             row.createCell(0).setCellValue(it.key)
             int j = 1
             it.value.each {
@@ -81,9 +81,9 @@ class WriteXLSXTest extends LocalizationPluginTestBase {
             i++
         }
 
-        OutputStream stream = new FileOutputStream(file);
-        workbook.write(stream);
-        stream.close();
+        OutputStream stream = new FileOutputStream(file)
+        workbook.write(stream)
+        stream.close()
     }
 
 }

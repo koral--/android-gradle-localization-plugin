@@ -6,7 +6,7 @@ class Utils {
     static final int BUFFER_SIZE = 128 * 1024
     private static
     final Pattern TAG_PATTERN = Pattern.compile('<([A-Z][A-Z0-9]*)\\b[^>]*((/?)|(>.*?</\\1>))', Pattern.CASE_INSENSITIVE | Pattern.DOTALL)
-    private static final Pattern CDATA_PATTERN = Pattern.compile('<!\\[CDATA\\[(.*?)\\]\\]>', Pattern.DOTALL)
+    private static final Pattern CDATA_PATTERN = Pattern.compile('<!\\[CDATA\\[(.*?)]]>', Pattern.DOTALL)
 
     static BufferedReader wrapReader(Reader reader) {
         new BufferedReader(reader, BUFFER_SIZE)
