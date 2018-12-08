@@ -225,7 +225,8 @@ class ParserEngine {
                     }
                 }
                 arrays.each { key, value ->
-                    'string-array'([name: key, translatable: translatableArrays[key] ? null : 'false']) {
+                    boolean translatable = translatableArrays.getOrDefault(key, true)
+                    'string-array'([name: key, translatable: translatable ? null : 'false']) {
                         value.each { stringArrayItem ->
                             item {
                                 yieldValue(mkp, stringArrayItem.value)
