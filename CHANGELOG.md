@@ -1,3 +1,7 @@
+### 1.0.13
+- fix extraneous `translatable` attribute generation for string arrays
+- dependencies versions bump
+
 ### 1.0.12
 - `handleEmptyTranslationsAsDefault` config parameter added - [#36](https://github.com/koral--/android-gradle-localization-plugin/pull/36)
 
