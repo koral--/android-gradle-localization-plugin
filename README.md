@@ -22,7 +22,7 @@ Generation has to be invoked as additional gradle task. Java 1.8 is required.
 ## Applying plugin
 ### Gradle 2.1+
 In whichever `build.gradle` file.
-```
+```groovy
 plugins {
   id 'pl.droidsonroids.localization' version '1.0.12'
 }
@@ -32,7 +32,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
 ### All versions of Gradle
 1. Add dependency to the __top-level__ `build.gradle` file.
 
- ```
+ ```groovy
   buildscript {
      repositories {
          mavenCentral()
@@ -46,7 +46,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
  ```
  Note: `mavenCentral()` and/or `jcenter()` repository can be specified, `+` can be used as wildcard in version number.
 2. Apply plugin and add configuration to `build.gradle` of the application, eg:
- ```
+ ```groovy
  apply plugin: 'pl.droidsonroids.localization'
  ```
  
@@ -172,7 +172,10 @@ of throwing an exception. First rows with given key will be taken into account.
  XML attribute. See [Tools Attributes](http://tools.android.com/tech-docs/tools-attributes#TOC-tools:locale)
  for more information.
 
-#### Migration from versions <1.0.7:
+#### Migration from versions < 1.0.13:
+Obsolete, non-scoped `localization` plugin id is no longer supported. The only valid id is `pl.droidsonroids.localization`.
+
+#### Migration from versions < 1.0.7:
 Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to true. Currently
 strings are always escaped when corresponding **parsed**  cell contains leading or trailing spaces,
 but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default.
