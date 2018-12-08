@@ -8,7 +8,7 @@ Gradle plugin for generating localized string resources
 This plugin generates Android string resource XML files from CSV or XLS(X) file.
 Generation has to be invoked as additional gradle task. Java 1.8 is required.
  
-##Supported features
+## Supported features
  * string arrays - see [Arrays](https://github.com/koral--/android-gradle-localization-plugin/wiki/Arrays)
  * plurals - see [Plurals](https://github.com/koral--/android-gradle-localization-plugin/wiki/Plurals)
  * non-translatable resources - `translatable` XML attribute
@@ -39,7 +39,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
          jcenter()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:3.0.1'
+         classpath 'com.android.tools.build:gradle:3.2.1'
          classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.12'
      }
  }
@@ -83,9 +83,8 @@ will produce 2 XML files:
 
 ## Configuration
 Add `localization` extension in `build.gradle` of particular module.
- ```
- localization
-     {
+ ```groovy
+ localization {
          csvFile=file('translations.csv')
          OR
          csvFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=csv'
@@ -95,7 +94,7 @@ Add `localization` extension in `build.gradle` of particular module.
          xlsFile=file('translations.xlsx')
          OR
          xlsFileURI='https://docs.google.com/spreadsheets/d/<key>/export?format=xlsx'
-     }
+}
  ```
 * `csvFileURI` and `xlsFileURI` can be any valid URI, not necessarily Google Docs' one
 * `xlsFile` and `xlsFileURI` accepts both XLSX and XLS files. If filename ends with `xls` file will
@@ -106,8 +105,8 @@ Sources,  __exactly one of them__ must be specified:
 * `csvFileURI`, `xlsFileURI` - CSV/XLS(X) file URI
 * `csvGenerationCommand` - shell command which writes CSV as text to standard output.
 Command string should be specified like for [Runtime#exec()](http://docs.oracle.com/javase/8/docs/api/java/lang/Runtime.html#exec-java.lang.String-).
-Standard error of the command is redirected to the standard error of the process executing gradle,
-so it could be seen in the gradle console.
+Standard error of the command is redirected to the standard error of the process executing Gradle,
+so it could be seen in the Gradle console.
 
 #### Spreadsheet format:
 * `defaultColumnName` - default=`'default'`, name of the column which corresponds to default localization
@@ -134,9 +133,9 @@ for more details
 #### (X)HTML tags escaping
 * `tagEscapingStrategy` - default=`IF_TAGS_ABSENT`, defines X(H)TML tag brackets (&lt; and &gt;) escaping strategy
 possible values:
- * `ALWAYS` - brackets are always escaped. Eg. "&lt;" in source becomes "&amp;lt;" in output XML
- * `NEVER` - brackets are never escaped. Eg. "&lt;" in source is passed without change to output XML
- * `IF_TAGS_ABSENT` - Brackets aren't escaped if text contains tags or CDATA section. Eg.
+ * `ALWAYS` - brackets are always escaped. E.g. "&lt;" in source becomes "&amp;lt;" in output XML
+ * `NEVER` - brackets are never escaped. E.g. "&lt;" in source is passed without change to output XML
+ * `IF_TAGS_ABSENT` - Brackets aren't escaped if text contains tags or CDATA section. E.g.
    &lt;b&gt;bold&lt;/b&gt; will be passed without change, but "if x&lt;4 then…" becomes "if x&amp;lt;4 then…".
  * `tagEscapingStrategyColumnName` - default=unset (no column), name of the column containing non-default tag escaping strategy, if cell is non-empty then strategy 
  defined there is used instead of global one
@@ -156,11 +155,12 @@ ignored if `multiSheets` is set to true
 
 #### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
-contain column names eg. `['Section', 'Notes']`
+contain column names e.g. `['Section', 'Notes']`
 * `allowNonTranslatableTranslation` - default=`false`, if set to true resources marked
 non-translatable but translated are permitted
 * `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted
-* `handleEmptyTranslationsAsDefault` - default=`false`, if set to true empty values do not result in entries in non-default languages, i.e. no empty XML entries for non-default languages being created. If set to `true` then `allowEmptyTranslations` is ignored for all but default language
+* `handleEmptyTranslationsAsDefault` - default=`false`, if set to true empty values do not result in entries in non-default languages, 
+i.e. no empty XML entries for non-default languages being created. If set to `true` then `allowEmptyTranslations` is ignored for all but default language
 * `outputFileName` - default=`strings.xml`, XML file name (with extension) which should be generated as an output
 * `outputIndent` - default=`  `(two spaces), character(s) used to indent each line in output XML files
 * `skipInvalidName` - default=`false`, if set to true then rows with invalid key names will be ignored instead
