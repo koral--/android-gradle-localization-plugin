@@ -1,5 +1,8 @@
+### 1.0.14
+- fixed `IF_TAGS_ABSENT` tag escaping strategy
+
 ### 1.0.13
-- fix extraneous `translatable` attribute generation for string arrays
+- fixed extraneous `translatable` attribute generation for string arrays
 - dependencies versions bump
 
 ### 1.0.12
