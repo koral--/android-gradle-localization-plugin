@@ -241,7 +241,7 @@ class ParserEngine {
     }
 
     private void yieldValue(MarkupBuilderHelper mkp, String value, TagEscapingStrategy strategy = mConfig.tagEscapingStrategy) {
-        if (strategy == ALWAYS || (strategy == IF_TAGS_ABSENT && Utils.containsHTML(value)))
+        if (strategy == ALWAYS || (strategy == IF_TAGS_ABSENT && !Utils.containsHTML(value)))
             mkp.yield(value)
         else
             mkp.yieldUnescaped(value)
