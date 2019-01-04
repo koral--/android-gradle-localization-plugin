@@ -24,7 +24,7 @@ Generation has to be invoked as additional gradle task. Java 1.8 is required.
 In whichever `build.gradle` file.
 ```groovy
 plugins {
-  id 'pl.droidsonroids.localization' version '1.0.14'
+  id 'pl.droidsonroids.localization' version '1.0.15'
 }
 ```
 Note: exact version number must be specified, `+` cannot be used as wildcard.
@@ -40,7 +40,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
      }
      dependencies {
          classpath 'com.android.tools.build:gradle:3.2.1'
-         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.14'
+         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.15'
      }
  }
  ```

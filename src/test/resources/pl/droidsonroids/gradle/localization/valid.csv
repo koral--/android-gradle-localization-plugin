@@ -3,7 +3,8 @@ app         ,Application, ,,false
 cow[one]  ,cow      ,krowa
 file        ,File       ,"Plik"     ,file label ,
 days[],monday,,,false
-cow[other],cows     ,krowy,comment
+cow[few],,krowy,comment
+cow[other],cows,krów,comment
 days[],tuesday,,,
 days[],wednesday,,,
 

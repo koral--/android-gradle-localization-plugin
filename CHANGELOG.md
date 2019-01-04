@@ -1,3 +1,7 @@
+### 1.0.15
+- added support for empty plural values
+- dependencies versions bump
+
 ### 1.0.14
 - fixed `IF_TAGS_ABSENT` tag escaping strategy
 
