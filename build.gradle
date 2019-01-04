@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     implementation gradleApi()
-    implementation 'org.codehaus.groovy:groovy:2.5.4'
+    implementation 'org.codehaus.groovy:groovy:2.5.5'
     implementation 'org.marketcetera.fork:commons-csv:3.0.12'
     implementation 'org.apache.poi:poi-ooxml-schemas:4.0.1'
     implementation 'org.apache.poi:poi-ooxml:4.0.1'
