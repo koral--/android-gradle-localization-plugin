@@ -152,11 +152,26 @@ class ParserEngine {
                         if (!translatable && !mConfig.allowNonTranslatableTranslation && builder.mQualifier != mConfig.defaultColumnName)
                             throw new IllegalArgumentException("$name is translated but marked translatable='false', row #${i + 1}")
                     }
+
+                    TagEscapingStrategy strategy = mConfig.tagEscapingStrategy
+                    if (sourceInfo.mTagEscapingStrategyIndex >= 0) {
+                        def strategyName = row[sourceInfo.mTagEscapingStrategyIndex]
+                        if (strategyName) {
+                            strategy = TagEscapingStrategy.valueOf(strategyName)
+                        }
+                    }
+
+                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
+                        if (mConfig.skipInvalidName)
+                            continue
+                        throw new IllegalArgumentException("$name is not valid name, row #${i + 1}")
+                    }
+
                     if (mConfig.escapeSlashes)
                         value = value.replace("\\", "\\\\")
                     if (mConfig.escapeApostrophes)
                         value = value.replace("'", "\\'")
-                    if (mConfig.escapeQuotes) //TODO don't escape tag attribute values
+                    if (mConfig.escapeQuotes && (strategy == ALWAYS || (strategy == IF_TAGS_ABSENT && !Utils.containsHTML(value))))
                         value = value.replace("\"", "\\\"")
                     if (mConfig.escapeNewLines)
                         value = value.replace("\n", "\\n")
@@ -168,11 +183,6 @@ class ParserEngine {
                     if (mConfig.normalizationForm)
                         value = Normalizer.normalize(value, mConfig.normalizationForm)
 
-                    if (!JAVA_IDENTIFIER_REGEX.matcher(name).matches()) {
-                        if (mConfig.skipInvalidName)
-                            continue
-                        throw new IllegalArgumentException("$name is not valid name, row #${i + 1}")
-                    }
                     if (resourceType == PLURAL || resourceType == ARRAY) {
                         //TODO require only one translatable value for all list?
                         if (resourceType == ARRAY) {
@@ -196,13 +206,6 @@ class ParserEngine {
                         if (mConfig.skipDuplicatedName)
                             continue
                         throw new IllegalArgumentException("$name is duplicated in row #${i + 1}")
-                    }
-                    TagEscapingStrategy strategy = mConfig.tagEscapingStrategy
-                    if (sourceInfo.mTagEscapingStrategyIndex >= 0) {
-                        def strategyName = row[sourceInfo.mTagEscapingStrategyIndex]
-                        if (strategyName) {
-                            strategy = TagEscapingStrategy.valueOf(strategyName)
-                        }
                     }
                     string(stringAttrs) {
                         yieldValue(mkp, value, strategy)
