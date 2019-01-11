@@ -1,3 +1,6 @@
+### 1.0.16
+- extended tag escaping strategy to quotes around attribute values
+
 ### 1.0.15
 - added support for empty plural values
 - dependencies versions bump
