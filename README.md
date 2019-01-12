@@ -45,6 +45,7 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
  }
  ```
  Note: `mavenCentral()` and/or `jcenter()` repository can be specified, `+` can be used as wildcard in version number.
+ 
 2. Apply plugin and add configuration to `build.gradle` of the application, eg:
  ```groovy
  apply plugin: 'pl.droidsonroids.localization'
@@ -151,7 +152,7 @@ possible values:
 #### XLS(X) format:
 * `sheetName` - default=`<name of the first sheet>`, name of the sheet to be processed, only one can be specified, 
 ignored if `multiSheets` is set to true
-* `multiSheets` - default=`false`, if set to true all sheets are processed and `sheetName` is ignored
+* `useAllSheets` - default=`false`, if set to true all sheets are processed and `sheetName` is ignored
 
 #### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
