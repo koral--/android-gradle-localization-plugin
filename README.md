@@ -151,7 +151,7 @@ possible values:
 
 #### XLS(X) format:
 * `sheetName` - default=`<name of the first sheet>`, name of the sheet to be processed, only one can be specified, 
-ignored if `multiSheets` is set to true
+ignored if `useAllSheets` is set to true
 * `useAllSheets` - default=`false`, if set to true all sheets are processed and `sheetName` is ignored
 
 #### Advanced options:
