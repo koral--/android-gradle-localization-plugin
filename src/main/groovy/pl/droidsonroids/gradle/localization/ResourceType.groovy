@@ -1,5 +1,5 @@
 package pl.droidsonroids.gradle.localization
 
-public enum ResourceType {
+enum ResourceType {
     STRING, PLURAL, ARRAY
 }

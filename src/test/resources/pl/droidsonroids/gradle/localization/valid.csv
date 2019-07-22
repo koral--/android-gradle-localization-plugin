@@ -7,6 +7,7 @@ cow[few],,krowy,comment
 cow[other],cows,krów,comment
 days[],tuesday,,,
 days[],wednesday,,,
+days[],,,,
 
 percent,%d %s,,,false,false
 tag,<b>test</b>,,,false,false,ALWAYS

@@ -8,46 +8,46 @@ class SourceInfoTest {
     private ConfigExtension config
 
     @Before
-    public void setUp() {
+    void setUp() {
         config = new ConfigExtension()
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNullHeader() {
+    void testNullHeader() {
         new SourceInfo(null, config, null)
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testEmptyHeader() {
+    void testEmptyHeader() {
         new SourceInfo([] as String[], config, null)
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testTooShortHeader() {
+    void testTooShortHeader() {
         new SourceInfo(['name'] as String[], config, null)
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testBothNameColumnIndexAndName() {
+    void testBothNameColumnIndexAndName() {
         config.nameColumnIndex = 1
         config.nameColumnName = 'name'
         new SourceInfo(VALID_HEADER, config, null)
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidNameColumnIndex() {
+    void testInvalidNameColumnIndex() {
         config.nameColumnIndex = 4
         new SourceInfo(VALID_HEADER, config, null)
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNonExistentNameColumnName() {
+    void testNonExistentNameColumnName() {
         config.nameColumnName = 'dummy'
         new SourceInfo(VALID_HEADER, config, null)
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testNonExistentDefaultColumnName() {
+    void testNonExistentDefaultColumnName() {
         new SourceInfo(['name', 'dummy'] as String[], config, null)
     }
 }
