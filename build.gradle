@@ -12,6 +12,7 @@ plugins {
     id 'signing'
     id 'jacoco'
     id 'java-gradle-plugin'
+    id 'com.github.ben-manes.versions' version '0.21.0'
 }
 
 apply from: 'mvn-push.gradle'
@@ -23,15 +24,15 @@ repositories {
 
 dependencies {
     implementation gradleApi()
-    implementation 'org.codehaus.groovy:groovy:2.5.5'
-    implementation 'org.marketcetera.fork:commons-csv:3.0.12'
-    implementation 'org.apache.poi:poi-ooxml-schemas:4.0.1'
-    implementation 'org.apache.poi:poi-ooxml:4.0.1'
-    implementation 'org.apache.poi:poi:4.0.1'
+    implementation 'org.codehaus.groovy:groovy:2.5.7'
+    implementation 'org.marketcetera.fork:commons-csv:3.2.0'
+    implementation 'org.apache.poi:poi-ooxml-schemas:4.1.0'
+    implementation 'org.apache.poi:poi-ooxml:4.1.0'
+    implementation 'org.apache.poi:poi:4.1.0'
     implementation 'org.apache.poi:ooxml-schemas:1.4'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.assertj:assertj-core:3.11.1'
-    testImplementation 'org.xmlunit:xmlunit-core:2.6.2'
+    testImplementation 'org.xmlunit:xmlunit-core:2.6.3'
 }
 
 group = GROUP
