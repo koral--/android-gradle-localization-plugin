@@ -6,7 +6,7 @@ import groovy.transform.TupleConstructor
  * Descriptor of quantity item
  */
 @TupleConstructor
-class PluralItem {
+class PluralItem implements Comparable<PluralItem> {
     Quantity quantity
     String value
     String comment
@@ -29,5 +29,10 @@ class PluralItem {
     @Override
     String toString() {
         return "PluralItem{value='$value', quantity=$quantity}"
+    }
+
+    @Override
+    int compareTo(PluralItem pluralItem) {
+        return quantity <=> pluralItem.quantity
     }
 }

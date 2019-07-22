@@ -92,7 +92,7 @@ class ParserEngine {
                 if (cells.length <= 1)
                     return
                 def stringAttrs = new LinkedHashMap<>(2)
-                def pluralsMap = new HashMap<String, HashSet<PluralItem>>()
+                def pluralsMap = new HashMap<String, Set<PluralItem>>()
                 def arrays = new HashMap<String, List<StringArrayItem>>()
                 for (i in 1..cells.length - 1) {
                     String[] row = cells[i]
@@ -193,7 +193,7 @@ class ParserEngine {
                             Quantity pluralQuantity = Quantity.valueOf(indexValue)
                             if (!Quantity.values().contains(pluralQuantity))
                                 throw new IllegalArgumentException("${pluralQuantity.name()} is not valid quantity, row #${i + 1}")
-                            HashSet<PluralItem> quantitiesSet = pluralsMap.get(name, [] as HashSet)
+                            Set<PluralItem> quantitiesSet = pluralsMap.get(name, [] as TreeSet)
                             if (!value.empty) {
                                 if (!quantitiesSet.add(new PluralItem(pluralQuantity, value, comment)))
                                     throw new IllegalArgumentException("$name is duplicated in row #${i + 1}")
