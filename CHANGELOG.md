@@ -1,3 +1,7 @@
+### 1.0.17
+- Add plurals sorting
+- Dependency versions bump
+
 ### 1.0.16
 - extended tag escaping strategy to quotes around attribute values
 
