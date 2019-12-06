@@ -18,6 +18,7 @@ Generation has to be invoked as additional gradle task. Java 1.8 is required.
  * comments
  * formatted strings - `formatted` XML attribute
  * default locale specification - `tools:locale`
+ * evaluate cell formulas
   
 ## Applying plugin
 ### Gradle 2.1+
@@ -153,6 +154,7 @@ possible values:
 * `sheetName` - default=`<name of the first sheet>`, name of the sheet to be processed, only one can be specified, 
 ignored if `useAllSheets` is set to true
 * `useAllSheets` - default=`false`, if set to true all sheets are processed and `sheetName` is ignored
+* `evaluateFormulas` - default=`false`, if set to true evaluates formulas in cells
 
 #### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should

@@ -18,6 +18,7 @@ class ConfigExtension {
     boolean convertTripleDotsToHorizontalEllipsis = true
     boolean escapeSlashes = true
     boolean useAllSheets = false
+    boolean evaluateFormulas = false
     TagEscapingStrategy tagEscapingStrategy = TagEscapingStrategy.IF_TAGS_ABSENT
     Normalizer.Form normalizationForm = Normalizer.Form.NFC
     String defaultColumnName = 'default'
