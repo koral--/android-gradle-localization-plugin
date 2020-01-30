@@ -25,7 +25,7 @@ Generation has to be invoked as additional gradle task. Java 1.8 is required.
 In whichever `build.gradle` file.
 ```groovy
 plugins {
-  id 'pl.droidsonroids.localization' version '1.0.17'
+  id 'pl.droidsonroids.localization' version '1.0.19'
 }
 ```
 Note: exact version number must be specified, `+` cannot be used as wildcard.
@@ -40,8 +40,8 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
          jcenter()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:3.4.2'
-         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.17'
+         classpath 'com.android.tools.build:gradle:3.5.3'
+         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.19'
      }
  }
  ```
@@ -158,7 +158,7 @@ ignored if `useAllSheets` is set to true
 
 #### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
-contain column names e.g. `['Section', 'Notes']`
+contain column names e.g. `['Section', 'Notes']`. Columns containing only empty cells are always ignored.
 * `allowNonTranslatableTranslation` - default=`false`, if set to true resources marked
 non-translatable but translated are permitted
 * `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted

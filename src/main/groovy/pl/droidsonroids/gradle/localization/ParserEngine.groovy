@@ -65,8 +65,12 @@ class ParserEngine {
     void parseSpreadsheet() {
         mCloseableInput.withCloseable {
             Map<String, String[][]> sheets = mParser.getResult()
-            for (String sheetName: sheets.keySet()) {
+            for (String sheetName : sheets.keySet()) {
                 String[][] allCells = sheets.get(sheetName)
+
+                def shouldIgnoreEmptyHeaderCell = mConfig.ignorableColumns.contains("")
+                Utils.validateColumnEmptiness(allCells, shouldIgnoreEmptyHeaderCell)
+
                 String outputFileName
                 if (sheetName != null) {
                     outputFileName = sheetName + ".xml"
@@ -96,7 +100,7 @@ class ParserEngine {
                 def arrays = new HashMap<String, List<StringArrayItem>>()
                 for (i in 1..cells.length - 1) {
                     String[] row = cells[i]
-                    if (row == null) {
+                    if (row == null || row.every { it.isEmpty() }) {
                         continue
                     }
                     if (row.length < sourceInfo.mColumnsCount) {
@@ -108,7 +112,7 @@ class ParserEngine {
                     }
 
                     String name = row[sourceInfo.mNameIdx]
-                    def value = row[j]
+                    String value = row[j]
 
                     String comment = null
                     if (sourceInfo.mCommentIndex >= 0 && !row[sourceInfo.mCommentIndex].empty) {

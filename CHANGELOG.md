@@ -1,3 +1,7 @@
+### 1.0.19
+- Filter out empty rows and columns, fixes XLS(X) parsing errors - [#47](https://github.com/koral--/android-gradle-localization-plugin/issues/47)
+- Dependency versions bump
+
 ### 1.0.18
 - Add option to evaluate formulas in XLS(X) files - [#45](https://github.com/koral--/android-gradle-localization-plugin/pull/45)
 - Dependency versions bump

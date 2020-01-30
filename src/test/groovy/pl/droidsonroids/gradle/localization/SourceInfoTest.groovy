@@ -13,18 +13,8 @@ class SourceInfoTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    void testNullHeader() {
-        new SourceInfo(null, config, null)
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     void testEmptyHeader() {
         new SourceInfo([] as String[], config, null)
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    void testTooShortHeader() {
-        new SourceInfo(['name'] as String[], config, null)
     }
 
     @Test(expected = IllegalArgumentException.class)
