@@ -14,10 +14,6 @@ class SourceInfo {
     }
 
     SourceInfo(String[] headerLine, ConfigExtension config, File resDir, String outputFileName) {
-        if (headerLine == null || headerLine.length < 2) {
-            throw new IllegalArgumentException("Invalid header: $headerLine")
-        }
-
         List<String> header = Arrays.asList(headerLine)
         mColumnsCount = headerLine.length
         mBuilders = new XMLBuilder[mColumnsCount]
@@ -47,7 +43,7 @@ class SourceInfo {
             throw new IllegalStateException("Default locale column not present")
         }
 
-        def reservedColumns = [config.commentColumnName, config.translatableColumnName, config.formattedColumnName]
+        def reservedColumns = [config.commentColumnName, config.translatableColumnName, config.formattedColumnName, ""]
         if (config.tagEscapingStrategyColumnName != null) {
             reservedColumns.add(config.tagEscapingStrategyColumnName)
         }

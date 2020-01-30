@@ -19,4 +19,22 @@ class Utils {
     static boolean containsHTML(String text) {
         return TAG_PATTERN.matcher(text).find() || CDATA_PATTERN.matcher(text).find()
     }
+
+    static void validateColumnEmptiness(String[][] allCells, boolean shouldIgnoreEmptyHeaderCell) {
+        def headerLine = allCells[0]
+        if (headerLine == null || headerLine.length < 2) {
+            throw new IllegalArgumentException("Invalid header: $headerLine")
+        }
+
+        if (!shouldIgnoreEmptyHeaderCell) {
+            def emptyHeaderIndices = headerLine.findIndexValues { it.empty }
+            allCells.eachWithIndex { String[] row, int rowIndex ->
+                emptyHeaderIndices.forEach { i ->
+                    if (i < row.length && !row[i.intValue()].empty) {
+                        throw new IllegalArgumentException("Not ignored column #$i contains empty header but non-empty cell at row #$rowIndex")
+                    }
+                }
+            }
+        }
+    }
 }
