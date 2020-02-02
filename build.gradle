@@ -31,7 +31,7 @@ dependencies {
     implementation 'org.apache.poi:poi:4.1.1'
     implementation 'org.apache.poi:ooxml-schemas:1.4'
     testImplementation 'junit:junit:4.13'
-    testImplementation 'org.assertj:assertj-core:3.14.0'
+    testImplementation 'org.assertj:assertj-core:3.15.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.6.3'
 }
 
