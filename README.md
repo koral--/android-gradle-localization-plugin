@@ -142,7 +142,6 @@ possible values:
  * `tagEscapingStrategyColumnName` - default=unset (no column), name of the column containing non-default tag escaping strategy, if cell is non-empty then strategy 
  defined there is used instead of global one
   
-
 #### CSV format:
 * `csvStrategy` - default=`null` (library default strategy, equivalent of
 [CSVStrategy.DEFAULT_STRATEGY](https://lucene.apache.org/solr/4_0_0/solr-core/org/apache/solr/internal/csv/CSVStrategy.html#DEFAULT_STRATEGY))
@@ -175,11 +174,15 @@ of throwing an exception. First rows with given key will be taken into account.
  XML attribute. See [Tools Attributes](http://tools.android.com/tech-docs/tools-attributes#TOC-tools:locale)
  for more information.
 
+#### Migration from versions < 1.0.19
+Since version 1.0.19 completely empty (effectively empty in case of XLS(X)) rows and columns are ignored. Moreover if qualifier (usually language code) is empty exception is thrown.
+Previously behavior in such cases was undefined.
+
 #### Migration from versions < 1.0.13:
 Obsolete, non-scoped `localization` plugin id is no longer supported. The only valid id is `pl.droidsonroids.localization`.
 
 #### Migration from versions < 1.0.7:
-Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to true. Currently
+Versions older than 1.0.7 provided `escapeBoundarySpaces` option, which defaulted to `true`. Currently
 strings are always escaped when corresponding **parsed**  cell contains leading or trailing spaces,
 but such spaces are stripped by default CSV strategy. So effectively strings are trimmed by default.
 If you want to include mentioned spaces in output set appropriate `csvStrategy`.
