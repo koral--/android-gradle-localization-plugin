@@ -29,9 +29,11 @@ class Utils {
         if (!shouldIgnoreEmptyHeaderCell) {
             def emptyHeaderIndices = headerLine.findIndexValues { it.empty }
             allCells.eachWithIndex { String[] row, int rowIndex ->
-                emptyHeaderIndices.forEach { i ->
-                    if (i < row.length && !row[i.intValue()].empty) {
-                        throw new IllegalArgumentException("Not ignored column #$i contains empty header but non-empty cell at row #$rowIndex")
+                if (row != null) {
+                    emptyHeaderIndices.forEach { i ->
+                        if (i < row.length && !row[i.intValue()].empty) {
+                            throw new IllegalArgumentException("Not ignored column #$i contains empty header but non-empty cell at row #$rowIndex")
+                        }
                     }
                 }
             }
