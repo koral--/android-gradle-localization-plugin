@@ -1,85 +1,74 @@
 buildscript {
     repositories {
-        jcenter()
         mavenCentral()
     }
 }
 
 plugins {
-    id 'com.gradle.plugin-publish' version '0.10.1'
+    id 'com.gradle.plugin-publish' version '1.2.1'
     id 'groovy'
-    id 'maven'
     id 'signing'
     id 'jacoco'
     id 'java-gradle-plugin'
-    id 'com.github.ben-manes.versions' version '0.27.0'
+    id 'com.github.ben-manes.versions' version '0.49.0'
 }
 
-apply from: 'mvn-push.gradle'
+//apply from: 'mvn-push.gradle'
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
     implementation gradleApi()
-    implementation 'org.codehaus.groovy:groovy:2.5.9'
-    implementation 'org.marketcetera.fork:commons-csv:3.2.0'
-    implementation 'org.apache.poi:poi-ooxml-schemas:4.1.1'
-    implementation 'org.apache.poi:poi-ooxml:4.1.1'
-    implementation 'org.apache.poi:poi:4.1.1'
+    implementation 'org.codehaus.groovy:groovy:3.0.19'
+    implementation 'org.marketcetera.fork:commons-csv:4.1.1'
+    implementation 'org.apache.poi:poi-ooxml-lite:5.2.4'
+    implementation 'org.apache.poi:poi-ooxml:5.2.4'
+    implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:ooxml-schemas:1.4'
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'org.assertj:assertj-core:3.15.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.6.3'
-}
-
-group = GROUP
-version = VERSION_NAME
-
-pluginBundle {
-    website = POM_URL
-    vcsUrl = POM_SCM_URL
-    description = POM_DESCRIPTION
-    tags = ['localization', 'android']
-
-    plugins {
-        localization {
-            displayName = POM_NAME
-            description = POM_DESCRIPTION
-        }
-    }
+    testImplementation gradleTestKit()
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
 }
 
 gradlePlugin {
+    website = POM_URL
+    vcsUrl = POM_URL
+
     plugins {
-        localization {
+        pitest {
             id = 'pl.droidsonroids.localization'
             implementationClass = 'pl.droidsonroids.gradle.localization.LocalizationPlugin'
+            tags.addAll('localization', 'android', 'l10n', 'i18n')
+            displayName = POM_NAME
+            description = POM_DESCRIPTION
+            version = VERSION_NAME
+            group = GROUP
         }
     }
 }
 
 jacoco {
-    toolVersion = '0.8.4'
+    toolVersion = '0.8.11'
 }
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        csv.enabled false
+        xml.required = true
+        csv.required = false
     }
+    dependsOn test
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_7
+tasks.withType(GroovyCompile).configureEach {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
 
-uploadArchives.dependsOn check
-
-task copyTestResources(type: Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test"
-    group = 'verification'
-    description = 'To be used in Android Studio, workaround for https://code.google.com/p/android/issues/detail?id=64887'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
 }

@@ -9,7 +9,7 @@ Gradle plugin for generating localized string resources
 
 ## Overview
 This plugin generates Android string resource XML files from CSV or XLS(X) file.
-Generation has to be invoked as additional gradle task. Java 1.8 is required.
+Generation has to be invoked as additional Gradle task. Java 1.8 is required.
  
 ## Supported features
  * string arrays - see [Arrays](https://github.com/koral--/android-gradle-localization-plugin/wiki/Arrays)
@@ -28,7 +28,7 @@ Generation has to be invoked as additional gradle task. Java 1.8 is required.
 In whichever `build.gradle` file.
 ```groovy
 plugins {
-  id 'pl.droidsonroids.localization' version '1.0.19'
+  id 'pl.droidsonroids.localization' version '1.0.20'
 }
 ```
 Note: exact version number must be specified, `+` cannot be used as wildcard.
@@ -40,15 +40,14 @@ Note: exact version number must be specified, `+` cannot be used as wildcard.
   buildscript {
      repositories {
          mavenCentral()
-         jcenter()
      }
      dependencies {
-         classpath 'com.android.tools.build:gradle:3.5.3'
-         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.19'
+         classpath 'com.android.tools.build:gradle:8.2.1'
+         classpath 'pl.droidsonroids.gradle.localization:android-gradle-localization-plugin:1.0.20'
      }
  }
  ```
- Note: `mavenCentral()` and/or `jcenter()` repository can be specified, `+` can be used as wildcard in version number.
+ Note: `mavenCentral()` repository can be specified, `+` can be used as wildcard in version number.
  
 2. Apply plugin and add configuration to `build.gradle` of the application, eg:
  ```groovy
@@ -127,10 +126,10 @@ If both `nameColumnIndex` and `nameColumnName` are specified exception is thrown
 
 The following options turn off some character escaping and substitutions, can be useful if you have 
 something already escaped in source:
-* `escapeApostrophes` - default=`true`, if set to false apostrophes (`'`) won't be escaped
-* `escapeQuotes` - default=`true`, if set to false double quotes (`"`)  won't be escaped
-* `escapeNewLines` - default=`true`, if set to false newline characters won't be escaped
-* `convertTripleDotsToHorizontalEllipsis` - default=`true`, if set to false triple dots (`...`) won't be converted to ellipsis entity `&#8230;`
+* `escapeApostrophes` - default=`true`, if set to `false` apostrophes (`'`) won't be escaped
+* `escapeQuotes` - default=`true`, if set to `false` double quotes (`"`)  won't be escaped
+* `escapeNewLines` - default=`true`, if set to `false` newline characters won't be escaped
+* `convertTripleDotsToHorizontalEllipsis` - default=`true`, if set to `false` triple dots (`...`) won't be converted to ellipsis entity `&#8230;`
 * `escapeSlashes` - default=`true`, if set to false slashes (`\`) won't be escaped
 * `normalizationForm` - default=[Normalizer.Form.NFC](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC) if set to `null` Unicode normalization won't be performed, see [javadoc of Normalizer](http://docs.oracle.com/javase/8/docs/api/java/text/Normalizer.Form.html#NFC)
 for more details
@@ -154,31 +153,34 @@ possible values:
 
 #### XLS(X) format:
 * `sheetName` - default=`<name of the first sheet>`, name of the sheet to be processed, only one can be specified, 
-ignored if `useAllSheets` is set to true
-* `useAllSheets` - default=`false`, if set to true all sheets are processed and `sheetName` is ignored
-* `evaluateFormulas` - default=`false`, if set to true evaluates formulas in cells
+ignored if `useAllSheets` is set to `true`
+* `useAllSheets` - default=`false`, if set to `true` all sheets are processed and `sheetName` is ignored
+* `evaluateFormulas` - default=`false`, if set to `true` evaluates formulas in cells. 
+Note the formulas evaluated to empty strings result in `0.0` values. 
+E.g. if a given cell contains `=H4` and `H4` is empty then the result is `0.0`.
+If you want an empty result use a formula like `=IF(H4="", "", H4)`.
 
 #### Advanced options:
 * `ignorableColumns` - default=`[]`, columns from that list will be ignored during parsing. List should
 contain column names e.g. `['Section', 'Notes']`. Columns containing only empty cells are always ignored.
-* `allowNonTranslatableTranslation` - default=`false`, if set to true resources marked
+* `allowNonTranslatableTranslation` - default=`false`, if set to `true` resources marked
 non-translatable but translated are permitted
-* `allowEmptyTranslations` - default=`false`, if set to true then empty values are permitted
-* `handleEmptyTranslationsAsDefault` - default=`false`, if set to true empty values do not result in entries in non-default languages, 
+* `allowEmptyTranslations` - default=`false`, if set to `true` then empty values are permitted
+* `handleEmptyTranslationsAsDefault` - default=`false`, if set to `true` empty values do not result in entries in non-default languages, 
 i.e. no empty XML entries for non-default languages are created. If set to `true` then `allowEmptyTranslations` is ignored for all but default language
 * `outputFileName` - default=`strings.xml`, XML file name (with extension) which should be generated as an output
 * `outputIndent` - default=`  `(two spaces), character(s) used to indent each line in output XML files
-* `skipInvalidName` - default=`false`, if set to true then rows with invalid key names will be ignored instead
+* `skipInvalidName` - default=`false`, if set to `true` then rows with invalid key names will be ignored instead
 of throwing an exception
-* `skipDuplicatedName` - default=`false`, if set to true then rows with duplicated key names will be ignored instead
+* `skipDuplicatedName` - default=`false`, if set to `true` then rows with duplicated key names will be ignored instead
 of throwing an exception. First rows with given key will be taken into account.
-* `defaultLocaleQualifier` - language (eg. `es`) and optionally region (eg. `es_US`) ISO codes of default translations.
+* `defaultLocaleQualifier` - a language (e.g. `es`) and optionally a region (e.g. `es_US`) ISO codes of default translations.
  Default=`null`(unset) which effectively means English `en`, if set then value will be placed in `tools:locale`
  XML attribute. See [Tools Attributes](http://tools.android.com/tech-docs/tools-attributes#TOC-tools:locale)
  for more information.
 
 #### Migration from versions < 1.0.19
-Since version 1.0.19 completely empty (effectively empty in case of XLS(X)) rows and columns are ignored. Moreover if qualifier (usually language code) is empty exception is thrown.
+Since version 1.0.19 completely empty (effectively empty in case of XLS(X)) rows and columns are ignored. Moreover if qualifier (usually language code) is empty an exception is thrown.
 Previously behavior in such cases was undefined.
 
 #### Migration from versions < 1.0.13:

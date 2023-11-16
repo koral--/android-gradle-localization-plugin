@@ -1,3 +1,6 @@
+### 1.0.20
+- Dependency versions bump
+
 ### 1.0.19
 - Filter out empty rows and columns, fixes XLS(X) parsing errors - [#47](https://github.com/koral--/android-gradle-localization-plugin/issues/47)
 - Dependency versions bump
